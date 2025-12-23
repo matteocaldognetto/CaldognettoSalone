@@ -1,0 +1,636 @@
+\chapter{Specific Requirements}
+\label{ch:chapter_three} %
+
+\section{External interface requirements}
+\label{sec:External interface requirements} %
+
+\subsection{User interfaces}
+
+The user interface design for Best Bike Paths aims to ensure simple, intuitive, and functional use of the application for both registered and unregistered cyclists. The key interfaces are:
+
+\textbf{Homepage:} The homepage centers on the “Find Route” section, featuring an interactive map that displays only roads recognized by the system as cycling paths. The interface includes a search bar with two text fields for quickly entering a starting and destination address. Following data entry and validation, the path search is initiated. The map supports standard zoom and pan operations and features icons highlighting points of interest. The interface is visible to both registered and unregistered users, with limitations on other areas for the latter.
+
+\textbf{Registration/Login:} The registration and login interface presents a simple and clear form with fields for email and password, along with specific error messages for invalid inputs (e.g., incorrect email format). Registration requires implicit user consent for access to device sensors and for personal data and privacy processing. The process provides instant feedback to inform the user of success or any registration issues.
+
+\textbf{Find Route:} This interface is viewable by both registered and unregistered cyclists and displays on the map the possible cycling paths between the specified origin and destination. If no cycling paths are available between the points, the system shows an explanatory message. The routes, along with relevant information, are listed by name in a list on the right limited to five items, ordered by path score. By selecting a path, it is displayed on the map with a line tracing the path in the color corresponding to its status, along with reported obstacles shown on the map.
+
+\textbf{Manual Path Entry:} The manual path entry interface allows a registered user to manually enter a path into the system with all relevant information. The user can add each of the path's streets through a search bar where available street names can be typed or selected. Streets not recognized by the system as cycling paths are not accepted. For each street, the user can indicate its condition by choosing from a list of basic options (e.g., optimal, fair, sufficient, needs maintenance). Obstacles can then be reported directly on the map along with a brief description. The interface includes fields for entering the path name, an optional description, travel time, and a star rating from 1 to 5. A final button allows saving the entered data and viewing a path summary with relevant automatically calculated statistics (such as distance traveled and average speed). At that point, the user can choose to save the path in "My Paths" or publish it.
+
+\textbf{Automatic Path Entry:} The automatic route entry interface activates automatically when a registered user begins cycling, thanks to the device's sensors. At the end of the route, performance statistics and a list of detected streets to be confirmed or rejected are shown. Following confirmation, a summary is displayed featuring a map highlighting the traced route with obstacles automatically detected by the sensors, street names with their respective status, star ratings, statistics, and a box with weather conditions. The user can confirm, delete, or modify the data. They can then add a description and must provide a name for the path. At that point, the user can choose to save the path in "My Paths" or publish it.
+
+\textbf{Report Path:} Report Path: This interface allows for the re-review of an existing path previously created and published by another user. A search bar allows the user to find the existing path by name. Once the itinerary is selected, the interface displays its current details and enables the user to submit a new report. The cyclist can update the status of individual streets (e.g., optimal, fair, sufficient, needs maintenance), manage obstacles, add an optional description, and provide a new star score. Upon completion, the system confirms the success of the operation and automatically recalculates the path score and the overall path status, updating the information on the map for the entire community. Alternatively, the user can discard the report while in progress.
+
+\textbf{My Paths:} The “My Paths” interface allows users to view their saved routes in chronological order. Each entry shows information such as name, date, statistics, and any weather conditions. Simple buttons are available to delete, view, or publish private paths. By choosing to view a route, it is displayed on the map along with detected obstacles. From there, the user can return to the path list. Deletions require confirmation to prevent accidental removal. This section is available only to registered cyclists.
+
+\subsection{Hardware interfaces}
+
+Best Bike Paths is designed to be used on mobile devices such as smartphones and
+smartwatches, which must be equipped with essential built-in sensors including GPS,
+accelerometer, and gyroscope. These sensors are necessary to accurately detect cycling
+activity, track routes, and identify any road anomalies. The app must also operate effi-
+ciently under limited resource conditions, considering the typical battery and performance
+constraints of mobile devices. For proper operation, the device must support continuous
+data recording in the background, requiring the appropriate permissions from the user.
+No additional external hardware is expected.
+
+\subsection{Software interfaces}
+
+BBP uses various internal and external software components to deliver its functionalities.
+It interfaces with location service APIs to acquire GPS data and with external weather
+services to obtain real-time environmental updates. For interaction with device sensors
+and management of push notifications, BBP communicates with operating system features
+on smartphones and smartwatches. Collected data is synchronized with a cloud backend
+via RESTful APIs, which handle storage, updates, and sharing of routes and ratings.
+For interactive map visualization, BBP integrates specific libraries and SDKs to ensure a
+smooth and responsive user experience.
+
+\subsection{Communication interfaces}
+
+The application requires a stable internet connection for communication with the backend
+server and external services. Communications use secure protocols such as HTTPS with
+TLS to protect privacy and data integrity, including personal data, route tracking, and
+user feedback. Synchronization, route condition updates, and weather data retrieval occur
+in real time to keep information current. The system also supports push notifications
+through dedicated services that inform users about registration confirmations or important
+events related to detected routes.
+
+\section{Functional requirements}
+\label{sec:Functional requirements} %
+
+This section enumerates the detailed functional requirements of the Best Bike Paths system.
+
+\paragraph{R1} The system shall allow a new user to create an account by providing necessary information.
+
+\paragraph{R2} The system shall allow a registered user to log in by providing their credentials.
+
+\paragraph{R3} The system shall permit users who are not logged in (guests) to use core viewing functions.
+
+\paragraph{R4} The system shall provide an interface for a logged-in user to view and edit their profile information.
+
+\paragraph{R5} The system shall allow a user to log out of their account on a device.
+
+\paragraph{R6} The system should attempt to detect when the user is cycling and start recording.
+
+\paragraph{R7} While recording, the system shall log the sequence of GPS coordinates that represent the user’s path.
+
+\paragraph{R8} The system shall automatically compute summary statistics for the trip.
+
+\paragraph{R9} After stopping the recording and computing stats, the system shall show the user a summary of their ride. 
+
+\paragraph{R10} The system shall save the recorded trip data to the user’s account.
+
+\paragraph{R11} When a trip is recorded, the system shall attempt to retrieve weather data for the ride.
+
+\paragraph{R12} If weather data was successfully obtained for a trip, the system shall display it along with the other stats on the trip summary view (R11).
+
+\paragraph{R13} The system shall provide a feature for users to add a bike path entry manually.
+
+\paragraph{R14} The system shall allow the user to mark any known obstacles or hazards along the path.
+
+\paragraph{R15} The system shall prompt the user whether to publish this information to the community or keep it private.
+
+\paragraph{R17} The system shall support continuing recording even if the user switches apps or turns off the screen, once a recording is started.
+
+\paragraph{R18} While a trip recording is active (started by the user via R7), the system shall collect accelerometer and gyroscope data continuously in the background.
+
+\paragraph{R19} The system shall analyze the sensor data in real-time (or in short batches) to detect possible road anomalies.
+
+\paragraph{R20} For each detected potential obstacle or anomaly during the ride, the system shall log it internally in the context of the current recording.
+
+\paragraph{R21} When the trip is finished, if the system has any automatically detected events (R20), it shall prompt the user to review them.
+
+\paragraph{R22} The system shall present the detected events in a user-friendly way.
+
+\paragraph{R23} The user shall be able to confirm, reject or modifies the events.
+
+\paragraph{R24} After the user has finished reviewing and confirming the data from an automated collection ride, the system shall save the verified information.
+
+\paragraph{R25} The system shall maintain a central repository of all published bike path entries.
+
+\paragraph{R26} The system shall allow updates to existing path entries.
+
+\paragraph{R27} Whenever new path information is published, the system shall integrate it into the dataset used for route queries.
+
+\paragraph{R28} The system shall ensure that published path data does not include personal information about cyclists.
+
+\paragraph{R29} The system shall provide an interface for the user to specify a start and end location for their desired trip (route query).
+
+\paragraph{R30} The system shall compute a score or rating for each route found, to communicate its quality to the user.
+
+\paragraph{R31} The system shall display the calculated route(s) on the map UI for the user.
+
+\paragraph{R32} For each route, the system shall provide a summary of key details.
+
+\paragraph{R33} The system shall provide a section where a logged-in user can view their past recorded trips.
+
+\newpage
+\subsection{Use Cases and Use Case Diagrams}
+\textbf{Cyclist Case Diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Images/cyclist-use-case.png}
+    \label{fig:Cyclist Use Case}
+\end{figure}
+
+\newpage
+\textbf{UC1. Login Cyclist}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Login Cyclist \\ 
+  \hline Actors & Cyclist \\ 
+  \hline Entry condition & Cyclist already registered \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item Cyclist inserts credential in the proper input fields(email, password)
+      \item The system checks the validity of such information
+      \item The system redirects the cyclist to his/her personal dashboard
+  \end{enumerate}
+   \\
+  \hline Exit condition & Cyclist is logged in \\
+  \hline Exceptions & Invalid credentials \\ 
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\textbf{UC2. Sign-up Cyclist}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Sign-up Cyclist \\ 
+  \hline Actors & Cyclist \\ 
+  \hline Entry condition & Cyclist is not registered \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item The cyclist inserts his/her email in the proper input field.
+      \item The system checks if the email belongs to the whitelist of email domains and if the email has never been used.
+      \item The cyclist inserts his/her password in the proper input field.
+      \item The system checks if the password respects the requirements.
+      \item The system redirects the cyclist to a confirmation page.
+  \end{enumerate}
+   \\
+  \hline Exit condition & The cyclist is registered \\
+  \hline Exceptions & 
+  \begin{itemize}
+      \item The user’s email is already registered
+      \item The password doesn't satisfy the requirements
+  \end{itemize}
+  \\ 
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\textbf{UC3. Record Manually}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Record Manually \\ 
+  \hline Actors & Cyclist \\ 
+  \hline Entry condition & The cyclist has correctly logged in \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item The user enters the name of the streets in the path
+      \item The system validates the streets inserted
+      \item The cyclist inserts the status of each of the streets provided
+      \item The system creates the new bike path
+  \end{enumerate}
+   \\
+  \hline Exit condition & The user has correctly created manually his/her trip \\
+  \hline Exceptions & 
+  % \begin{enumerate}
+  %     \item The cyclist actually has no previous bike paths
+  %     \item The user decides to delete one of his/her trips
+  % \end{enumerate} \\ 
+  % \hline
+  
+  \begin{itemize}
+  \item The user inserts an invalid street
+  \item The user doesn't provide the status of the streets
+  \end{itemize} \\
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\textbf{UC4. Record Automatically}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Record Automatically \\ 
+  \hline Actors & Cyclist, WeatherAPI, DeviceSensor \\ 
+  \hline Entry condition & Cyclist already registered \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item The cyclist starts his/her trip bringing with him/her his/her mobile device
+      \item The system triggers the start of the recording process when the cyclist reaches a certain speed
+      \item The system keeps track of the path and any significant movement of the device
+      \item The user stops the trip
+      \item <<\textit{include}>> “Verify detected obstacles”
+      \item The system creates the new bike path
+  \end{enumerate}
+   \\
+  \hline Exit condition & A bike path has been correctly created in automated mode \\
+  \hline Exceptions & The device dies during the trip \\
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\textbf{UC5. Verify detected obstacles}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Verify detected obstacles \\ 
+  \hline Actors & Cyclist \\ 
+  \hline Entry condition & 
+  \begin{itemize}
+      \item The cyclist has correctly logged in 
+      \item The cyclist has finished his/her trip
+  \end{itemize} \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item The system displays a report of the path and retrieves a list of detected potential obstacles
+      \item The cyclist checks every proposed obstacles and submits the report
+  \end{enumerate}
+   \\
+  \hline Exit condition & The obstacles has been validated \\
+  \hline Alternative 1 & The user modifies the position of an obstacle \\
+  \hline Exceptions & The user doesn't submit the report \\ 
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\textbf{UC6. Paths Lookup}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Path Lookup \\ 
+  \hline Actors & Cyclist \\ 
+  \hline Entry condition & Cyclist opens the BBP platform \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item The cyclist inserts the origin and the destination point
+      \item The system checks if there exists any bike paths that runs along those two points
+      \item The system show the results bike paths
+  \end{enumerate}
+   \\
+  \hline Exit condition & The cyclist has explored every bike path there is \\
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\textbf{UC7. Paths Browsing}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{ 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+  \hline Name & Trips Browsing \\ 
+  \hline Actors & Cyclist \\ 
+  \hline Entry condition & The cyclist has correctly logged in \\
+  \hline Events &  
+  \begin{enumerate}[label=\alph*)]
+      \item The user navigates to his personal page
+      \item The system displays all his/her saved bike paths
+  \end{enumerate}
+   \\
+  \hline Exit condition & The user has seen all his/her recorded bike paths \\
+  \hline Alternative 1 & The user decides to delete one of his/her trips \\
+  \hline Alternative 2 & The user decides to modify one of his/her trips \\
+  \hline Alternative 3 & The user decides to make public one of his/her trips \\
+  \hline Exceptions & The cyclist actually has no previous bike paths \\ 
+  \hline
+    \end{tabularx}
+    \label{tab:Login Cyclist}
+\end{table}
+
+\newpage
+\subsection{Activity and Sequence diagrams}
+
+% Signup
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.95\linewidth]{Images/register-activity-digram.png}
+    \label{fig:placeholder}
+    \caption{Signup}
+\end{figure}
+
+% Login
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.95\linewidth]{Images/login-activity-digram.drawio.png}
+    \label{fig:placeholder}
+    \caption{Login}
+\end{figure}
+
+% \textbf{Manual Recording}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Images/manual-recording-sequence.png}
+    \label{fig:placeholder}
+    \caption{Manual Recording}
+\end{figure}
+
+% \textbf{Automatically Recording}
+\begin{figure}[H]
+    \centering
+\includegraphics[width=0.95\linewidth]{Images/record-automatically-sequence-diagram.drawio.png}
+    \label{fig:placeholder}
+    \caption{Automatically Recording}
+\end{figure}
+
+% Verify obstacles
+\begin{figure}[H]
+    \centering
+\includegraphics[width=0.95\linewidth]{Images/verify-detected-obstacles-activity-diagram.drawio.png}
+    \label{fig:placeholder}
+    \caption{Verify Detected Obstacles}
+\end{figure}
+
+% path-lookup
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Images/path-lookup-activity-diagram.drawio.png}
+    \label{fig:placeholder}
+    \caption{Path Lookup}
+\end{figure}
+
+% path-browsing
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Images/path-browsing-activity-diagram.drawio.png}
+    \label{fig:placeholder}
+    \caption{Path Browsing}
+\end{figure}
+
+\newpage
+\subsection{Requirements Mapping}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}{\textbf{G1 : Unregistered cyclists can register into the system}} \\
+        \hline
+        \begin{itemize}
+            \item [R1] The system shall allow a new user to create an account by providing necessary information.
+        \end{itemize}
+        & 
+        \begin{itemize}
+            \item [D6] All users have an active email address.
+        \end{itemize}
+        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}{\textbf{G2 : Registered cyclists can log into the system}} \\
+        \hline
+        \begin{itemize}
+         \item [R2] The system shall allow a registered user to log in by providing their credentials.
+        \end{itemize}
+        & \\ 
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}
+        {\textbf{G3 : Registered cyclists can manually record and insert information about their bike paths, including their status and the presence o relevant obstacles, to keep track of their cycling activities}} 
+        \\
+        \hline
+        \begin{itemize}
+          \item [R13] The system shall provide a feature for users to add a bike path entry manually.
+          \item [R14] The system shall allow the user to mark any known obstacles or hazards along the path.
+          \item [R8] The system shall automatically compute summary statistics for the trip.
+          \item [R10] The system shall save the recorded trip data to the user’s account.
+          \item [R11] When a trip is recorded, the system shall attempt to retrieve weather data for the ride.
+          \item [R12] If weather data was successfully obtained for a trip, the system shall display it along with the other stats on the trip summary view (R11).
+          \item [R15] The system shall prompt the user whether to publish this information to the community or keep it private.
+        \end{itemize}
+        &
+        \begin{itemize}
+          \item [D3] External Services Availability
+          \item [D4] Data Privacy and Regulations
+        \end{itemize}
+        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+
+
+\newpage
+\begin{table}[H]
+\begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+    \hline
+    \multicolumn{2}{|p{0.98\textwidth}|}{\textbf{G5 : Registered cyclists can automatically record their bike paths, including their status and the presence o relevant obstacles, to keep track of their cycling activities, confirming, correcting or deleting the provided feedback about the cycling trip they’ve just traveled}} \\
+    \hline
+    \begin{itemize}
+    \item [R16] The system should attempt to detect when the user is cycling even if they haven’t explicitly started recording.
+    \item [R7] While recording, the system shall log the sequence of GPS coordinates that represent the user’s path.
+    \item [R8] The system shall automatically compute summary statistics for the trip.
+    \item [R9] After stopping the recording and computing stats, the system shall show the user a summary of their ride.
+    \item [R10] The system shall save the recorded trip data to the user’s account.
+    \item [R11] When a trip is recorded, the system shall attempt to retrieve weather data for the ride.
+    \item [R12] If weather data was successfully obtained for a trip, the system shall display it along with the other stats on the trip summary view (R11).
+    \item [R17] The system shall support continuing recording even if the user switches apps or turns off the screen, once a recording is started.
+    \item [R18] While a trip recording is active (started by the user via R7), the system shall collect accelerometer and gyroscope data continuously in the background.
+    \item [R19] The system shall analyze the sensor data in real-time (or in short batches) to detect possible road anomalies.
+    [R20] For each detected potential obstacle or anomaly during the ride, the system shall log it internally in the context of the current recording.
+    \end{itemize}
+    &
+    \begin{itemize}
+        \item [D1] Accuracy of Sensor-based Detection.
+        \item [D2] User Confirmation Mitigates False Positives.
+        \item [D3] External Services Availability.
+        \item [D4] Data Privacy and Regulations.
+        \item [D5] Maintaining Updated Path Information.
+    \end{itemize}
+    \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[]
+    \centering
+\begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+    \begin{itemize}
+        \item [R21] When the trip is finished, if the system has any automatically detected events (R20), it shall prompt the user to review them.
+        \item [R22] The system shall present the detected events in a user-friendly way.
+        \item [R23] The user shall be able to confirm, reject or modifies the events.
+        \item [R14] The system shall allow the user to mark any known obstacles or hazards along the path.
+        \item [R24] After the user has finished reviewing and confirming the data from an automated collection ride, the system shall save the verified information.
+    \end{itemize}
+         & \\
+         \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}{\textbf{G6 : Registered and unregistered cyclists can visualize on a map the bike paths between a point of origin and a point of destination}} \\
+        \hline
+        \begin{itemize}
+            \item [R3] The system shall permit users who are not logged in (guests) to use core viewing functions. 
+            \item [R15] The system shall prompt the user whether to publish this information to the community or keep it private.
+            \item [R26] The system shall maintain a central repository of all published bike path entries.
+            \item [R27] The system shall allow updates to existing path entries.
+            \item [R28] Whenever new path information is published, the system shall integrate it into the dataset used for route queries.
+            \item [R29] The system shall provide an interface for the user to specify a start and end location for their desired trip (route query).
+            \item [R30] The system shall compute a score or rating for each route found, to communicate its quality to the user.
+            \item [R31] The system shall display the calculated route(s) on the map UI for the user.
+            \item [R32] For each route, the system shall provide a summary of key details.
+        \end{itemize}
+        &
+        \begin{itemize}
+            \item [D5] Maintaining Updated Path Information
+        \end{itemize}
+        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}{\textbf{G7 : Registered cyclists can consult their own inventory of recorded bike trips.}} \\
+        \hline
+        \begin{itemize}
+            \item [R10] The system shall save the recorded trip data to the user’s account.
+            \item [R26] The system shall maintain a central repository of all published bike path entries.
+            \item [R27] The system shall allow updates to existing path entries.
+            \item [R33] The system shall provide a section where a logged-in user can view their past recorded trips.
+        \end{itemize}
+        & \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}{\textbf{G8 : Registered cyclists can delete data they have already recorded in their itinerary on a specific route.}} \\
+        \hline
+        \begin{itemize}
+            \item [R27] The system shall allow updates to existing path entries.
+        \end{itemize}
+        &
+        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.48\textwidth}|p{0.48\textwidth}|}
+        \hline
+        \multicolumn{2}{|p{\textwidth}|}{\textbf{G9 : Registered cyclists can delete information they have already shared with the community on a specific route.}} \\
+        \hline
+        \begin{itemize}
+            \item [R27] The system shall allow updates to existing path entries.
+        \end{itemize}
+        &
+        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\newpage
+\section{Performance requirements}
+\label{sec:Performance requirements} %
+
+The application’s GPS logging should be efficient and accurate. It shall obtain location updates at least once every few seconds (configurable based on desired detail). The position error should ideally be within 5-10 meters (typical for GPS) when signal is good. The system must handle up to, say, 10 hours of continuous tracking without crashing or exhausting memory (ensuring route data is streamed to storage incrementally, not all kept in RAM).
+
+\section{Design constraints}
+\label{sec:Design constraints} %
+
+\subsection{Standards compliance}
+
+\begin{itemize}
+    \item Best Bike Paths complies with the General Data Protection Regulation (GDPR) to ensure user privacy protection and proper management of personal data.
+    \item Communications between client and server occur via secure protocols, such as HTTPS and TLS, to guarantee the confidentiality and integrity of transmitted information.
+    \item The app adheres to usage policies of external service APIs, including request limits and specific provider conditions.
+    \item The system uses the standard UTC time format to ensure correct synchronization of events and data across various devices and servers.
+\end{itemize}
+
+\subsection{Hardware limitations}
+
+\begin{itemize}
+    \item BBP is designed for mobile devices equipped with GPS, accelerometer, and gyroscope sensors necessary for detecting cycling activity and route conditions.
+    \item It must be compatible with a wide range of smartphones and smartwatches, ensuring efficient use of computing resources and battery life.
+    \item The app supports background recording with optimized sensor sampling to limit energy consumption, while respecting mobile operating system restrictions.
+    \item Explicit user authorization is required for continuous access to location sensors during recording.
+\end{itemize}
+
+\subsection{Any other constraint}
+
+\begin{itemize}
+    \item BBP must manage degradation or interruptions of external services (weather and routing), ensuring core functions remain operational in such cases.
+\end{itemize}
+
+\section{Software systems attributes}
+\label{sec:Software systems attributes} %
+
+\subsection{Reliability}
+
+The system must operate without interruption for extended periods. To achieve fault tolerance, its back-end deployment should utilize replication and redundancy. Additionally, the system should maintain offline backups of data storage for use in disaster recovery in the event of data loss.
+
+\subsection{Availability}
+
+The BBP system (especially server-side components for route queries and data sync) should have high availability. Target uptime could be 99.9\%; this implies that the Mean Time To Recovery (MTTR), or the
+average time required to restore service after a fault occurs, should be limited to approximately 0.365 days per year. Maintenance should be scheduled in off-peak times and, if possible, done without taking the service completely offline (rolling updates).
+
+\subsection{Security}
+
+The BBP platform does not store sensitive personal information about users; only email and password
+are collected during the sign-up process.
+
+All communication between the mobile app and the backend server shall be encrypted using HTTPS. This protects sensitive data like login credentials and location info from eavesdropping. Similarly, calls to third-party APIs should use HTTPS endpoints. There should be no transmission of personal data over unencrypted channels.
+
+On the backend, user data (account info, ride logs) shall be stored securely.
+Passwords must be hashed with a strong algorithm – so even if the database is compromised, raw passwords are not exposed.
+Personal information linking a user to their contributions should be protected – for example, published path data might not reveal the user’s identity publicly, but in the database it’s linked; that database should have proper access controls and not be exposed.
+Regular security measures like firewalling the database, using prepared statements (to avoid SQL injection) are required. These might be considered design-level, but they stem from the requirement of safeguarding data integrity and confidentiality.
+
+\subsection{Maintainability}
+
+The system must uphold a strong standard for maintainability. This involves implementing appropriate design patterns and maintaining high-quality standards. The code needs to be well-documented, and the use of hard coding should be kept to a minimum. Furthermore, a thorough testing routine should be established, which covers at least 75\% of the entire codebase, excluding interface code.
+
+\subsection{Portability}
+
+The mobile app shall support a range of devices like Android and iOS. While the app should follow platform UI conventions, core functionality and data should be consistent between Android and iOS versions. A user switching platforms should find BBP has the same features and their account data accessible. This means the backend and API serve both. Any platform-specific limitations should be abstracted (e.g., differences in sensor API are handled within each app, but both deliver similar results).

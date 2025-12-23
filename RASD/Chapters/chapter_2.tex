@@ -1,0 +1,231 @@
+\chapter{Overall Description}
+\label{ch:Overall Description}%
+
+\section{Product perspective}
+\label{sec:Product perspective} %
+
+\subsection{Scenarios}
+
+\paragraph{Registration and authentication} 
+
+Marco is an enthusiastic cyclist who wants to efficiently record his bike rides and discover new cycling routes to make the most of his time on the bike. 
+
+To do so, he decides to register on Best Bike Paths, gaining access to all features available to registered users. For the registration process, Marco provides his email address, his name and a password, after which the system confirms that the registration was successful. 
+
+In this phase, he also grants automatically the BBP app the necessary permissions to access device sensors (GPS, accelerometer, gyroscope) and to collect background data. These permissions are essential for enabling automatic route detection and detailed ride tracking, while ensuring full compliance with privacy regulations and data protection laws.
+
+Once his account is created, he can log in using his credentials to enter the app whenever he wants and start using its tools to record and review his cycling routes.
+
+\paragraph{Automated route recording} 
+
+The registered cyclist Marco launches the BBP app, which then continues running in the background as he starts riding.
+
+The BBP system automatically detects Marco’s bicycle usage through the device’s speed and motion sensors and begins collecting GPS data to track the entire route taken. %If the GPS detects that the cyclist is traveling on a road not classified as bike-friendly, it notifies him that tracking the entire itinerary is not possible.
+
+Simultaneously, the BBP system detects any obstacles or issues (e.g., potholes, bumps, etc.) through movements recorded by the cyclist’s device accelerometer and gyroscope, using which it assigns a condition rating to the roads traveled (e.g., optimal, fair, sufficient, needs maintenance).  
+BBP also calculates in real time the statistics maintained by Marco during the route, such as total distance covered and average speed.
+Additionally, during the trip BBP queries external services to provide up-to-date weather data (weather conditions, temperature, wind, etc.) for the area of travel.
+
+The system then automatically detects the end of the trip when Marco stops pedaling.
+Once the trip is finished, the cyclist can view each detected street, performance statistics, and weather conditions. Marco can confirm or reject the detected streets. At that point, he views all the automatically recorded information related to the path: the entire route with the status of each street, the overall rating, statistics, weather, and detected obstacles. The cyclist can decide whether to keep or modify the collected data or delete the path entirely. 
+
+Once this process is completed, Marco gives a name to the path and can choose either to keep the itinerary private (stored in "My Paths") or to publish and share it with the BBP community. Finally, the system confirms to Marco that the recording or publication was successful.
+
+\paragraph{Manual route recording} 
+
+The registered cyclist Marco decides to record a route he has already completed using the manual mode.  
+
+Marco accesses the dedicated function within the BBP app and specifies the names of the streets composing the itinerary, along with an overall rating from 1 to 5. Once these are entered, he can evaluate their conditions (e.g., optimal, fair, sufficient, needs maintenance) and report any obstacles or issues on the path via the map. % It is not possible to add non-existent streets or those that are not considered part of the cycling path system. 
+The cyclist add data calculated by himself, such as the travel time, through which the system, which calculates and provides the total distance based on the entered route, can supply statistics like Marco’s average speed.
+
+% The cyclist is then required to provide an overall rating of the route from 1 to 5 and can report the presence of any obstacles or problems via descriptive notes.  
+
+Once the data entry is confirmed, Marco gives a name to the path and he can choose whether to save the itinerary only for himself (stored in "My paths") or to publish and share it with the BBP community.  
+In the latter case, the BBP system updates the overall path score of the route.  
+
+Finally, the system confirms to Marco that the recording or publication was successfully completed.
+
+\paragraph{Path visualization between two points} 
+
+The cyclist Marco wants to know how to get to work by bike.
+
+He opens BBP and in the app’s search interface, he specifies his home address as the starting point and his workplace address as the destination. The system then verifies the validity of the addresses and the availability of at least one cycling route between the two points.
+
+Each paths is assigned an overall path score aggregated from the condition of the streets composing it (e.g., optimal, fair, sufficient, needs maintenance) and effectiveness of the itinerary in connecting the origin and destination points is also evaluated.
+
+If multiple routes connect the two points, the BBP system orders them by path score (from highest to lowest) and displays up to the top five in a ranked list next to the map. By clicking on any available route, it is displayed on the map along with the identified obstacles and relevant information. 
+Once Marco finds his preferred itinerary, he can close the consultation and go to work by bike.
+
+\paragraph{Display of the registered paths in the personal inventory} 
+
+The registered cyclist Marco wants to access the "My Paths" section of BBP to view his recorded routes and check his progress.
+
+The BBP system then retrieves and displays a list of all routes recorded by the cyclist, showing for each the name, registration date, and time.
+If no routes are recorded, the system prompts the cyclist to record one.
+Marco can select a route and view it on the map along with any obstacles. In addition to the map, the recorded information about the itinerary is grouped and displayed: performance statistics, reviews (path conditions, specific notes), and any weather conditions. Marco can browse the route details and choose to share or delete a path. 
+
+Finally, Marco closes the consultation and returns to the main screen.
+
+\paragraph{Reporting another path}
+
+Reporting another path Registered cyclist Marco did not particularly like the path he had found to go to work because he encountered additional obstacles along the route that perhaps were not there before. He therefore decides to go to the "Report Path" section of the app, search for the path by name, and review it again. In this section, the cyclist can update the status of the streets, the presence of obstacles, and the overall rating. Once the report is completed, the path score and the overall status of the reported path are updated on the map.
+
+\subsection{Domain models}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/domain-model.png}
+\end{figure}
+The diagram above shows the Domain Class model, highlighting the entities included in our system and the relationships between them. Additional explanations are necessary to achieve a complete understanding.
+
+The abstract class \textbf{User} means to be useful in case of a potential extension, like the support also for runner, for instance.
+
+A \textbf{BikePath} represents the trip done by the cyclist, which could be public accessable or available only for that specific cyclist. The Path status here is computed based on the status of the respective the PathSegments.
+
+In case of automated recording, for each trip BBP keeps track of the data for the sensors and the GPS. These data are always private.
+
+If the signals coming from the \textbf{SensorSample} are above a certain threshold, the \textbf{Obstacle} is created.
+
+When the \textbf{TrackPoint}'s speed lows under a specific value, the trip is stopped and the system waits a confirmation about the tracks and the effectiveness of the found obstacles.
+
+In case of manual mode, the cyclist inserts the necessary information, as the street names and their status, in substitution to sensors' data.
+
+In any case, BBP has the sufficient information to save correctly the path.
+
+From the \textbf{TrackPoint}'s position the system derives the \textbf{PathSegments} that composed a \textbf{BikePath}.
+A \textbf{PathSegment} contains the potential obstacles in its path. The segment refers to a real street.
+
+A \textbf{Street} contains the basic data, like the set of coordinates it is made, its name and its speed limit. If there are obstacles across its path, the status is updated accordingly.
+A street is relevant only if the speed limit is under the threshold we imposed for the ciclist safety.
+
+\subsection{State Diagrams}
+
+% \paragraph{BikePath status}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=1\linewidth]{Images/bike-path-state-diagram.png}
+%     \label{fig:placeholder}
+% \end{figure}
+
+\paragraph{Obstacle lifecycle
+} The Obstacle lifecycle models the validation flow of obstacles detected along a path.
+In case of automated mode each obstacle starts in PENDING, awaiting confirmation or rejection by the user who performed the ride.
+A CONFIRMED report indicates that the obstacle truly exists; this event triggers a re-evaluation of the affected segment.
+A REJECTED report marks the detection as false, excluding it from future computations.
+Optionally, if a report remains PENDING beyond a configurable time limit, it transitions to EXPIRED, prompting revalidation or removal.
+This lifecycle ensures both automatic detection and human confirmation, maintaining data quality and credibility across the platform.
+In case of manual insertion, the obstacle is set automatically in CONFIRMED.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Images/obstacle-state-diagram.png}
+    \label{fig:placeholder}
+\end{figure}
+
+% da aggiungere qualche altro caso piu importante
+
+\section{Product functions}
+\label{sec:Product functions} %
+
+
+\textbf{User Registration and Authentication}
+
+This feature is optional and available to all users. It allows them to register and log in using an email and password, while also granting the necessary permissions to access the user’s device sensors.
+
+\textbf{Automatic Route Detection}
+
+This function enables the app to detect when a registered user is cycling (start and end of a route) by using the device’s motion and speed sensors, as well as GPS data to track the ride in real time. If the system detects that the cyclist is traveling on a road not classified as a cycling route, it pauses recording until a new route starts. This feature operates even when the app is running in the background.
+
+\textbf{Obstacle and Route Condition Detection}
+
+The app collects data from the device’s accelerometer and gyroscope to analyze and identify potholes or other potential obstacles on the road. At the end of the route, the system uses this data to assign an overall condition rating (e.g., optimal, fair, sufficient, needs maintenance). This feature is available to registered users while cycling, and continues to work in the background.
+
+\textbf{Travel Statistics Calculation}
+
+The system calculates in real time various performance statistics for registered users while they are cycling. These include average speed and total distance traveled, based on data collected from the device’s sensors, even when the app runs in the background.
+
+\textbf{Manual Route Logging}
+
+This feature allows a registered user to manually enter the details of a previously completed route. The cyclist provides the names of the streets that make up the route, together with their condition ratings (e.g., optimal, fair, sufficient, needs maintenance), and reports any obstacles or issues. The user must also input a score and travel time so that the system can calculate performance statistics. It is not possible to add streets that are not part of the recognized cycling path network.
+
+\textbf{Route Recording and Publishing}
+
+Once a route has been defined (either automatically or manually), registered users can assign it a name and choose whether to keep it private, stored in a personal list visible only to them, or publish it to share with the BBP community. If published, the system updates the list of shared routes and refreshes the status of both the paths and the streets involved.
+
+\textbf{Route Ratings and Reviews Management}
+
+This feature allows registered users to review the routes they have recorded assessing road conditions (e.g., optimal, fair, sufficient, needs maintenance), and noting the presence of potholes or other obstacles. In manual mode, the user provides these evaluations directly. 
+
+
+\textbf{Route Visualization on Map}
+
+All users, whether registered or not, can view cycling routes on a map. The feature lets the cyclist enter a starting and destination address, verifies that both are valid, and checks for at least one available cycling path between them. If no route exists, the system informs the user about it. Alongside the map, the app displays a list of up to five routes with the highest path scores. By selecting a route, users can view it on the map along with detailed information in panels, including estimated travel time, distance, reported obstacles, route name, and user reviews (ratings and condition data).
+
+The order is based on the score computed by this formula: 
+
+\vspace{1em}
+\begin{mdframed}[linewidth=1pt]
+
+\[
+\text{Path Score} = \alpha \cdot \overline{S} + \beta \cdot (1-\tilde{L}) - \gamma \cdot O_{\text{last}}
+\]
+
+Where:
+
+\begin{description}
+    \item [\(\overline{S}\)] = is the mean road-condition rating along the path, computed as the average of segment status scores on a 1–5 scale (5 = optimal, 1 = needs maintenance).
+    \item [\(\tilde{L}\)] = is the normalized deviation of the path from the straight-line origin–destination segment (range 0–1), where 0 indicates a very close path and 1 indicates a highly distant path.
+    \item [\(O_{\text{last}}\)] = is the number of obstacles reported since the last inspection/review of the path.
+    \item [\(\alpha, \beta, \gamma \)] = non-negative weights that control the relative importance of road condition, directness, and obstacle penalties (often chosen so that \(\alpha + \beta + \gamma = 1\)).
+\end{description}
+
+\end{mdframed}
+
+\textbf{Personal Routes Visualization and Management}
+
+In the “My Paths” section, registered users can view all their recorded routes along with their statistics and personal reviews. The system displays a complete list of recorded itineraries, including name, date, and recording time. If no routes are available, the app prompts the cyclist to record one. When a route is selected, it is shown on the map with grouped data displayed in descriptive panels or pop-ups, including performance statistics (total distance, travel time, and average speed), reviews (path conditions, obstacles, ratings, and notes), and any relevant weather details. The user can browse the route details and choose to share or delete a personal path.
+
+\textbf{External Route Reporting and Updating}
+
+This feature allows registered users to provide feedback on shared routes originally created and published by other members of the community. If a user identifies changes in road conditions or encounters new obstacles on an existing path, they can access the "Report Path" section to search for the route and submit an updated review. The user can modify the condition ratings of the specific streets, report new or resolved obstacles, and provide a new overall rating from 1 to 5. Once the report is submitted, the system re-calculates the overall path score and refreshes the status of the route on the map, ensuring that the information available to the community remains accurate and up-to-date.
+
+\section{User characteristics}
+\label{sec:User characteristics} %
+
+BBP is targeted at cycling enthusiasts and casual riders who stand to benefit from discovering safer or better routes and tracking their rides. The main user classes include:
+
+\textbf{Registered Cyclist (Contributor)}
+
+An individual who creates a BBP account. These users actively use the app to record their cycling trips and contribute information on bike paths. They are typically cyclists who ride frequently enough to want to log their rides or improve the route database. 
+They should have basic familiarity with smartphone apps and maps. Within this group, there may be power-users (for example, members of the cyclist club) who contribute a lot of data and perhaps act as local experts. Contributors are motivated by tracking their performance and by the community benefit of sharing route info.
+
+\textbf{Guest Cyclist (Viewer)}
+
+An individual (possibly a cyclist planning a ride or someone new in town looking for bike routes) who has not signed in. Guests primarily use BBP to query routes between two places and to view the community-contributed path information on the map. They cannot record new trips or add data. This class of users benefits from the system without directly adding to it. The app for them is purely a route-finding and informational tool. They may eventually sign up if they find value in contributing or saving their own data.
+
+One special consideration: cyclists using the app while riding will have limited attention for the device (safety comes first). Therefore, one could consider the “active rider” as a user state – when in this state, the UI needs to be very glanceable. This is more of a use context than a separate user class, but it affects design for all cyclists when they are on the move.
+
+\section{Assumptions, dependencies and constraints}
+\label{sec:Assumptions, dependencies and constraints} %
+
+The development and operation of BBP are subject to the following constraints and assumptions:
+
+\textbf{D1: Accuracy of Sensor-based Detection}
+It is assumed that the combination of GPS and motion sensors can provide sufficiently accurate data to identify cycling activity and road anomalies. The system will use a threshold (speeds between ~5 km/h and 30 km/h indicate bicycling) to guess when the user is biking. We acknowledge this may not be perfect (e.g., a very slow bike ride might drop below the threshold, or a car stuck in traffic could mimic cycling speeds), but we assume these edge cases are relatively rare or can be handled via user confirmation. The accelerometer/gyroscope-based pothole detection is also an approximation; we assume typical pothole hits produce a distinct sensor signature that our algorithms can detect reliably. Fine-tuning will be needed, but we proceed with the assumption that modern smartphones are capable of this task.
+
+\textbf{D2: User Confirmation Mitigates False Positives}
+We assume that users will take the time to review and confirm automatically detected obstacles after a ride. This is a crucial step to ensure data quality. It’s a constraint that automated data is not published without user intervention. Therefore, the system’s usefulness relies on active user participation. We assume that contributors are motivated to provide accurate info (perhaps out of community spirit or personal benefit of having a better database) and that this extra step is acceptable in the user experience.
+
+\textbf{D3: External Services Availability}
+The system depends on third-party services for weather (and possibly routing). We assume these services are generally available and reliable. A constraint is that BBP must abide by those services’ usage policies. If an external API is down or unreachable, BBP functionality may be degraded (for instance, missing weather data or map imagery), but core functions like trip recording should remain unaffected. We design BBP to handle such failures gracefully.
+
+\textbf{D4: Data Privacy and Regulations}
+It is assumed that collecting and storing user location data (trip logs) is permissible as long as we obtain user consent and protect the data. We also assume that the cyclist association has the right to use and distribute the user-contributed data (perhaps via user agreement in the app’s terms of service).
+
+% \textbf{D5: Device and OS Constraints}
+
+% Smartphones have limited battery life and computational resources. BBP must be designed under the constraint of efficient resource usage. For instance, continuous GPS and sensor use drains battery; thus we assume a constraint that BBP should optimize sensor sampling or allow the screen to turn off during recording to conserve power. Additionally, on some mobile OS versions, background activity is restricted; BBP might need to request special permissions or use foreground services to keep recording data. We assume we can work within these OS constraints by following best practices and requesting appropriate permissions from users (“Allow BBP to access your location continuously in the background?” which users must agree to for uninterrupted recording).
+
+\textbf{D5: Maintaining Updated Path Information}
+It is assumed that once the system is in use, the community will continually update and expand the path database. However, a constraint is that path condition can change over time (a path marked “Optimal” could degrade after a season or be under construction later). We assume that users will provide new reports if things change. We assume that the community input will be ongoing enough to keep data reasonably fresh.
+
+\textbf{D6: All users have an active email address.}

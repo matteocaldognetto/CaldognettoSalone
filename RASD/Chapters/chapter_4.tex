@@ -1,0 +1,379 @@
+\chapter{FORMAL ANALYSIS USING ALLOY}
+\label{ch:chapter_four} %
+% abbiamo fatto solo modello dinamico e non statico perchè nel nostro caso non è importante come sono i dati ma come evolvono (come quello dell'anno scorso). all'inizio della sezione sugli scenari c'è comunque un diagramma statico completo
+
+In this chapter, we present a report of the most significant results of the formal analysis of the system performed through the specification language Alloy 6. The primary objective is to validate the consistency of the domain model and the correctness of the system's dynamic behaviors. 
+
+Specifically, we focused on the lifecycle of the Bike Path and its associated Obstacle Reports. Since the application relies on both manual input and automated sensor detection (which may produce false positives), it is critical to ensure that unverified data is strictly isolated from the public domain. To achieve this, we defined a dynamic model that captures how the state of these entities evolves over time, from the moment a trip is recorded to its eventual publication to the community. This formal model specifically focuses on reports generated via automated sensor detection.
+
+\section{Signatures}
+\label{sec:Signatures} %
+
+Here is the list of all the signatures acting in the model, representing the main entities involved in the tracking and reporting process. We utilized the var keyword to indicate relations or attributes that can mutate over time, such as the growing inventory of a user or the changing status of a report during the validation process.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+// STATUS ENUMERATIONS
+enum PathCondition { Optimal, Medium, Sufficient, Maintenance }
+enum ReportStatus { Pending, Confirmed, Rejected, Corrected }
+enum Visibility { Private, Public }
+
+// CORE ENTITIES
+
+// The physical street infrastructure.
+sig Street {}
+
+// The registered user of the BBP platform.
+sig RegisteredCyclist {
+    var inventory: set BikePath
+}
+
+// The digital representation of a trip recorded by a user.
+sig BikePath {
+    owner: one RegisteredCyclist,
+    segments: set PathSegment,
+    var visibility: one Visibility,
+    var score: one Int 
+}
+
+// A segment of a trip that maps to a specific physical street.
+sig PathSegment {
+    refersTo: one Street,
+    var reports: set ObstacleReport,
+    var status: one PathCondition 
+}
+
+// A report regarding an obstacle or road condition.
+// (Maps to the 'Obstacle' entity in the Domain Model, 
+// but in this case we're talking about the entire 
+// lifecycle of an obstacle)
+var sig ObstacleReport {
+    var status: one ReportStatus,
+    var condition: one PathCondition 
+}
+\end{minted}
+
+\section{Facts}
+With the fact keyword, Alloy allows to define constraints and properties that must be true in all the possible instances of the model. Since we are modeling a dynamic system, we distinguish between structural constraints (which define valid relationships) and evolution constraints (which define valid state transitions over time).
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+// STRUCTURAL CONSTRAINTS 
+
+// Every obstacle report must belong to exactly one path segment.
+fact ReportHierarchy {
+    always (all r: ObstacleReport | one s: PathSegment | r in s.reports)
+}
+
+// Reports associated with a segment are bound to the context of that segment.
+fact ConsistentReporting {
+    always (all s: PathSegment, r: s.reports | r in ObstacleReport) 
+}
+
+// EVOLUTION AND LIFECYCLE 
+
+// Initialization: All newly created reports must start in the 'Pending' state.
+fact ReportInitialization {
+    always (all r: ObstacleReport | once (r.status = Pending))
+}
+
+// Evolution of Report Status
+fact ReportStatusEvolution {
+    always (all r: ObstacleReport |
+        (r.status = Pending implies r.status' in (Pending + Confirmed + Rejected + Corrected)) and
+        (r.status in (Confirmed + Rejected + Corrected) implies r.status' = r.status)
+    )
+}
+
+// Evolution of Visibility
+fact VisibilityEvolution {
+    always (all b: BikePath |
+        (b.visibility = Private implies b.visibility' in (Private + Public)) and
+        (b.visibility = Public implies b.visibility' = Public)
+    )
+}
+
+// SAFETY CRITICAL CONSTRAINTS 
+
+// Safe Publication Rule
+// Ensures that a Public path NEVER contains Pending reports.
+// This covers both the transition (becoming public) and the steady state (staying public).
+fact SafePublication {
+    always (all b: BikePath |
+        b.visibility = Public implies
+        no r: b.segments.reports | r.status = Pending
+    )
+}
+
+// Frame Condition
+fact FrameConditions {
+    always (all b: BikePath | 
+        b.visibility' != b.visibility implies (b.visibility = Private and b.visibility' = Public)
+    )
+}
+
+// Consistency: A segment with confirmed severe obstacles cannot be Optimal
+fact SafetyConsistency {
+    always (all s: PathSegment |
+        (some r: s.reports | r.status = Confirmed and r.condition = Maintenance)
+        implies s.status != Optimal
+    )
+}
+
+\end{minted}
+
+\section{Scenarios}
+In this section, we utilize specific predicates to simulate the most critical behaviors of the Best Bike Paths system. The generated instances allow us to visualize the evolution of the data over time steps, verifying that the lifecycle of reports and paths adheres to the specified requirements.
+
+\subsection{Model Instantiation}
+Before analyzing the dynamic evolution of the system, we present a static snapshot of a populated system instance. This visualization highlights the hierarchical relationships between the main entities (Cyclist, Bike Path, Segment, Report) and the environment (Street) as defined in the structural facts.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+// Visualization of the Domain Structure
+// Shows a populated instance with users, paths, segments, and streets
+pred WorldInstance[] {
+    #RegisteredCyclist = 1
+    #BikePath = 1
+    #PathSegment > 0
+    #ObstacleReport > 0
+    
+    // Constraint to force visual connections in the diagram
+    all b: BikePath | #b.segments > 0
+    all s: PathSegment | #s.reports > 0
+}
+run WorldInstance for 3
+\end{minted}
+
+The diagram below depicts a consistent state of the system where a RegisteredCyclist possesses a BikePath. The path is composed of PathSegments, which map to physical Streets and contain ObstacleReports. This structure validates the hierarchy enforced by the fact ReportHierarchy.
+
+\textit{Note on Visual Projection: To enhance the readability of the dynamic traces presented in the following sections (4.3.2 to 4.3.5), a visual projection has been applied to the generated diagrams. While the underlying model retains full structural consistency (including users, streets, and segments), the specific scenario diagrams explicitly display only the entities involved in the state transitions. Static structural elements that remain unchanged during the execution are hidden to strictly focus on the evolution of the data lifecycle.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/WorldInstance.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{The "Happy Path" (Validation and Publication)}
+This scenario illustrates the standard workflow for a registered cyclist. We simulate a sequence of events where a user records a trip containing a sensor-detected obstacle. Initially, the information is uncertain (Pending) and private. The user then reviews the data, confirms the obstacle, and finally publishes the path to the community.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+pred HappyPathPublication[] {
+    some b: BikePath, r: ObstacleReport | {
+        // Pre-condition
+        b.visibility = Private
+        r in b.segments.reports
+        r.status = Pending
+        
+        // Step A: User confirms
+        eventually (r.status = Confirmed)
+        
+        // Step B: Publish
+        eventually (b.visibility = Public)
+    }
+}
+run HappyPathPublication for 4 but exactly 1 RegisteredCyclist, 1 BikePath, 1 ObstacleReport
+\end{minted}
+
+The following sequence of diagrams depicts the temporal evolution of the instance generated by the predicate HappyPathPublication. The arrows indicate the current state of the entities at each significant time step.
+
+\textbf{Step 0: Initial Recording}
+
+At the beginning of the trace, the system has instantiated a BikePath containing one ObstacleReport generated by the sensors. As defined in the structural facts, the report status is initialized to Pending (indicating raw, uncertain sensor data), and the path visibility is Private.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{Images/HappyPathPublication_0.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Step 1: User Confirmation}
+
+In the subsequent state, the registered cyclist intervenes to review the collected data. The ObstacleReport status transitions to Confirmed. Crucially, the path visibility remains Private at this stage; the system enforces that the path cannot become public immediately, as the confirmation is a prerequisite for publication.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{Images/HappyPathPublication_1.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Step 2: Publication}
+
+Finally, since the data integrity constraint is satisfied (no Pending reports exist within the path), the system allows the BikePath visibility to transition to Public. The validated information is now shared with the community.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{Images/HappyPathPublication_2.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Handling False Positives (Safety Mechanism)}
+
+This scenario demonstrates the system's ability to filter out incorrect data (e.g., a bump detected as a pothole), ensuring the quality of the information database. We simulate a case where the sensors detect an anomaly, but the user identifies it as a false positive.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+pred RejectionScenario[] {
+    some r: ObstacleReport | {
+        // Pre-condition: Sensor detects an anomaly (Pending)
+        r.status = Pending
+        
+        // Step A: User rejects the report
+        eventually (r.status = Rejected)
+        
+        // Post-condition: The report stays rejected and never reverts to Pending
+        // This ensures the false positive is permanently excluded.
+        always (r.status = Rejected implies after r.status = Rejected)
+    }
+}
+run RejectionScenario for 3
+\end{minted}
+
+The following diagrams illustrate the temporal evolution of the instance generated by the predicate RejectionScenario. This trace highlights the safety mechanism preventing incorrect sensor data from polluting the system.
+
+\textbf{Step 0: Detection (Potential False Positive)} 
+
+At the beginning of the trace, an ObstacleReport is instantiated by the system based on sensor readings (e.g., accelerometer spikes). Its status is initialized to Pending, indicating that an anomaly has been detected but not yet validated by the user.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Images/RejectionScenario_0.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Step 1: User Rejection}
+
+In the subsequent step, the cyclist reviews the notification and identifies the detection as a false positive (e.g., a rough road patch mistaken for a pothole). The status transitions to Rejected. As specified in the model's logic, this report is now permanently flagged as invalid and will be excluded from the public map and path scoring algorithms.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/RejectionScenario_1.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Data Correction}
+
+This scenario illustrates the "Modify" workflow within the Obstacle Report lifecycle. It addresses the situation where a registered cyclist acknowledges a sensor detection but finds the automatically inferred details (such as the specific type of obstacle or its severity) to be inaccurate. This modification may include updating the report's condition/severity based on the user's perception. Instead of rejecting the report, the user updates the information, causing the report to transition from Pending to Corrected. In the system's logic, this state is treated as a valid verification, allowing the data to be preserved and used in future path scoring calculations.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+pred CorrectionScenario[] {
+    some r: ObstacleReport | {
+        // Pre-condition: Sensor detects an anomaly (Pending)
+        r.status = Pending
+        
+        // Step A: User modifies the details (e.g., obstacle type) and submits
+        // The status transitions to Corrected instead of Confirmed
+        eventually (r.status = Corrected)
+        
+        // Post-condition: The report remains in the Corrected state
+        // This ensures the user's manual input is finalized and preserved.
+        always (r.status = Corrected implies after r.status = Corrected)
+    }
+}
+run CorrectionScenario for 3
+\end{minted}
+
+The following diagrams visualize the temporal evolution of the instance generated by the predicate CorrectionScenario. These snapshots demonstrate how the system handles user modifications to automated reports.
+
+\textbf{Step 0: Initial Detection}
+
+At the beginning of the trace, the sensors instantiate an ObstacleReport with the status set to Pending. This indicates that the system has detected a potential anomaly, but the specific details (such as obstacle type or severity) are provisional and await user review.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Images/CorrectionScenario_0.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Step 1: User Correction}
+
+In the next step, the registered cyclist chooses to modify the report details instead of simply confirming or rejecting it. The status transitions to Corrected. This state validates the report's existence while updating its attributes based on the user's manual input, making it ready for inclusion in the path's statistics.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Images/CorrectionScenario_1.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Path Consistency and Degradation}
+This scenario focuses on the logical consistency between the reported data and the segment status. It addresses the requirement that the system must react to validated hazards by updating the path's condition properties. Specifically, we simulate a case where a segment is initially classified as Optimal. Subsequently, a sensor-detected report flagging a severe obstacle (Maintenance) is validated and Confirmed by the user. The scenario demonstrates that upon confirmation, the system enforces a consistency rule: the segment status automatically degrades, ensuring it is no longer marked as Optimal. This behavior proves that validated risk factors correctly influence the path's representation.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+pred ConsistencyScenario {
+    some s: PathSegment, r: ObstacleReport | {
+        // Pre-condition:
+        // The segment is initially Optimal
+        s.status = Optimal
+        // The report exists on this segment, is severe (Maintenance), but still Pending
+        r in s.reports
+        r.condition = Maintenance
+        r.status = Pending
+
+        // Step A: The user confirms the severe obstacle
+        eventually (r.status = Confirmed)
+
+        // Post-condition:
+        // Once the severe report is confirmed, the segment status MUST change.
+        // It serves as a proof that the segment is no longer considered 'Optimal'.
+        always (r.status = Confirmed implies s.status != Optimal)
+    }
+}
+run ConsistencyScenario for 3
+\end{minted}
+
+The following diagrams visualize the temporal evolution of the instance generated by the predicate ConsistencyScenario. These snapshots demonstrate the enforcement of the data integrity rule, highlighting how the validation of a severe hazard forces an immediate update to the path's condition status.
+
+\textbf{Step 0: Initial Inconsistency (Transient State)}
+
+At the beginning of the trace, the PathSegment is currently rated as Optimal (first). Simultaneously, the system holds an ObstacleReport flagged with a severe condition (Maintenance), but its validation status is still Pending. This represents the transient state where a potential hazard has been detected by sensors but has not yet been validated by a user.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{Images/ConsistencyScenario_0.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Step 1: Consistency Enforcement}
+
+In the subsequent state, the user validates the report, transitioning its status to Confirmed. As visualized in the diagram, the consistency rule triggers an immediate update: the PathSegment status shifts away from Optimal, settling into Maintenance (last). This proves that the system automatically enforces data integrity, ensuring that a path with a confirmed severe obstacle cannot remain classified as optimal.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Images/ConsistencyScenario_1.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\section{Assertions}
+In addition to simulating specific execution traces through predicates, which serve primarily to demonstrate that certain behaviors are possible (as seen in the "Happy Path" and "Rejection" scenarios), the formal analysis requires a stronger verification method to prove system correctness. To achieve this, we employ assertions. Unlike predicates, which look for a single instance satisfying a condition, assertions command the Alloy analyzer to search the entire state space for any possible violation of a specified property. If no violation is found, it provides a high degree of confidence that the property holds true in all possible execution scenarios.
+
+For the Best Bike Paths (BBP) system, the most critical invariant concerns Data Integrity and Trust. Since the platform relies heavily on automated sensor detection, there is an inherent risk of generating "false positives" (e.g., detecting a pothole where there is none). If such unverified data were to be exposed to the public community, the reliability of the platform would be compromised. Therefore, we must formally prove that the system's logic strictly prevents the publication of any path that has not completed the validation workflow.
+
+The following assertion, PublicSafety, formalizes this requirement. It imposes a constraint that must hold valid at every instant of time (always) and for every bike path instance in the system.
+
+\begin{minted}[linenos, frame=lines, fontsize=\small]{alloy}
+// Safety Check: Public Data Integrity
+// We assert that it is IMPOSSIBLE for a BikePath to be 'Public' 
+// while containing any 'Pending' (unverified) reports.
+assert PublicSafety {
+    always (
+        all b: BikePath | 
+        b.visibility = Public implies 
+        no r: b.segments.reports | r.status = Pending
+    )
+}
+check PublicSafety for 5
+\end{minted}
+
+The assertion logic can be broken down as follows:
+
+\begin{itemize}
+
+    \item [] \textbf{Temporal Scope:} The always keyword ensures the check is performed continuously across all state transitions, not just at the beginning or end of a trace.
+
+    \item [] \textbf{Universal Quantification:} We iterate over all b: BikePath to ensure no path escapes the check.
+
+    \item [] \textbf{Implication:} The condition is triggered only when a path becomes Public (b.visibility = Public implies...).
+    
+    \item [] \textbf{Forbidden State:} The right-hand side of the implication (no r... | r.status = Pending) asserts that the set of pending reports within that public path must be empty.
+    
+\end{itemize}
+
+To verify the results, executing the check command on the model produced the result: No counterexample found. This outcome is significant as it confirms that the structural constraints and evolution rules defined in Section 4.2 are robust. Specifically, the model mathematically demonstrates that there is no sequence of operations (user actions, sensor updates, or system transitions) that could trick the system into publishing a path while it still contains unverified sensor data. The requirement for manual user confirmation before publication is thus formally guaranteed.
+

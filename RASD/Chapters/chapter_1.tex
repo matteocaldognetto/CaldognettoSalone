@@ -1,0 +1,170 @@
+\chapter{Introduction}
+\label{ch:Introduction}%
+
+\section{Purpose}
+\label{sec:Purpose} %
+The increase in bicycle use as a sustainable means of transport requires effective solutions to encourage more users to choose cycling, while ensuring usability and safety during bike path journeys. Best Bike Paths is designed to support these goals by offering a platform that allows users to record their trips, view bike routes, and share valuable information about the condition of paths and potential obstacles.
+
+The application aims to create an integrated environment where cyclists, both professional and recreational, can actively contribute to the mapping and management of routes through manual entries or recording and collecting automatically their itineraries, integrating the ability to view detailed statistics for each outing, such as distance traveled and average speed.
+
+BBP further incorporates a standardized system to suggest the best bike routes from an origin to a destination, based on reviews and scores assigned to the paths, facilitating the choice of safer and more comfortable routes. The app can also provide updated weather information, enriching the cyclist's experience.
+
+The primary goal of BBP is therefore to promote the use of bicycles as a daily transport option, encouraging the sharing and access to updated and reliable information on bike path conditions and the discovery of new paths. In doing so, BBP aims to enhance the quality of sustainable mobility in cities, offering a useful service both to experienced cyclists and newcomers to urban cycling.
+
+\subsection{Goals}
+
+\begin{itemize}
+
+    \item [G1]: Unregistered cyclists can register into the system
+
+    \item [G2]: Registered cyclists can log into the system
+
+    \item [G3]: Registered cyclists can manually record and insert information about their bike paths, including their status and the presence of relevant obstacles, to keep track of their cycling activities.
+
+    \item [G4]: Registered and unregistered cyclists can visualize on a map the bike paths between a point of origin and a point of destination
+
+    \item [G5]: Registered cyclists can automatically record their bike paths, including their status and the presence o relevant obstacles, to keep track of their cycling activities.
+
+    \item [G6]: Registered cyclists can confirm, correct or delete the automatically provided feedback about a cycling trip they've just traveled.
+
+    \item [G7]: Registered cyclists can consult their own inventory of recorded bike trips.
+
+    \item [G8]: Registered cyclists can delete data they have already recorded in their itinerary on a specific route.
+    
+    \item [G9]: Registered cyclists can delete information they have already shared with the community on a specific route.
+    % G7 e G8 sono giusti secondo te???? li ho ripetuti anche negli SP
+
+    \item [G10]: Registered cyclists can submit a comprehensive report on an existing bike path created by another user.
+    % Aggiunto per il programma
+
+    \item [G11]: Registered cyclists can publish bike paths that were previously recorded privately.
+    % Aggiunto per il programma
+    
+\end{itemize}
+
+\section{Scope}
+\label{sec:Scope}
+Best Bike Paths (BBP) is a digital platform aimed at supporting cyclists, both professional and amateur, in recording, sharing, and consulting useful information. The main actors are the cyclists, divided into registered and unregistered users.
+
+Registered users can use the system to record their bike itineraries and save them to monitor their cycling activities. The system provides various detailed statistics for each trip, offering concrete support for the evaluation and planning of journeys. Registered users can also input data on the condition of bike paths. These data can be entered manually, such as reports of obstacles or changes in the pathway, or collected automatically through sensors integrated into the users' mobile devices. Before the automatically collected information is published and made available to the community, it must be confirmed or corrected by the users themselves, ensuring the reliability of the reports.
+
+All users, whether registered or not, can use a map visualization feature to identify bike routes from a starting point to a final destination. The routes are ordered and recommended according to how many obstacles they contain, when applicable, and how close they are to the two locations.
+
+The scope of the project is limited to functionalities related to data collection, verification, publication, and consultation within the BBP platform, with the aim of improving cycling experiences, promoting mobility by bike, and enhancing road safety and comfort through active participation by the user community.
+
+\subsection{World Phenomena}
+
+\begin{itemize}
+
+    \item [WP1]: The sensors of registered cyclists’ devices detect speed, route, travel time, and any sudden or irregular movements during the bike ride.
+
+    \item [WP2]: External services provide real-time information about weather conditions of the trips.
+
+    \item [WP3]: Registered cyclist decides to start using the bike.
+
+    \item[WP4]: External services provide route mapping information.
+    % aggiunto x programma
+    \item [WP5]: Roads may contain physical obstacles or irregularities.
+
+\end{itemize}
+
+\subsection{Shared Phenomena}
+
+\begin{itemize}
+    \item [SP1]: Registered cyclists enter information about bike path conditions manually.
+    
+    \item [SP2]: Registered cyclists confirm, correct or refuse automatically acquired data about their last bike trip.
+
+    \item [SP3]: Registered cyclists make the entered information publishable, making it accessible to the community.
+
+    \item [SP4]: Registered and unregistered cyclists request the display on a map of bike routes between an origin and a final destination.
+
+    \item [SP5]: The system receives information about bike paths from external sensors automatically.
+
+    \item [SP6]: Registered cyclists record a new bike itinerary and stores it in the system to keep track of it.
+
+    \item [SP7]: The system processes and provides detailed statistics to the user regarding their recorded bike trips.
+
+    \item [SP8]: The device's sensors, by detecting the movement speed, update the system that a registered cyclist has started or finished using bike.
+
+    \item [SP9]: Registered cyclists remove information already recorded on their personal itinerary.
+
+    \item [SP10]: Registered cyclists remove data concerning a route previously shared with the community.
+    % SP9 e SP10 sono corretti secondo te????
+
+    \item[SP11]: The system receives mapping information from external services.
+
+    \item[SP12]: Registered cyclists review a bike path previously created by another user.
+
+    \item[SP13]: Registered cyclists publish bike paths that were previously recorded privately. 
+\end{itemize}
+
+\section{Definitions, Acronyms, Abbreviations}
+\label{sec:Definitions, Acronyms, Abbreviations} %
+
+\subsection{Definitions}
+\textbf{Street/Path segment}: intended to be one where a proper bike track exists or where cars are rare and speed limits are compatible with the average speed of a bike, that corresponds to 14.3 km/h, so we can assume a proper range could be 5-25km/h \cite{avg_bike_speed}. It's a constitutive element of the bike path. It has its own status (e.g., optimal, fair, sufficient, needs maintenance) indicating its condition.
+
+\textbf{Bike Path}: route made up of multiple streets.
+
+\textbf{Mobile device}: a portable device that has an embedded system architecture, processing capability, on-board memory, and may have telephony capabilities (for example, cell phones, tablets, and smartphones) \cite{mobile_device}.
+
+\textbf{Manual Mode}: bikers insert the data manually, specifying the name of the streets in the path and their status.
+
+\textbf{Automated Mode}: bikers let BBP acquire data from their mobile devices while they bike. BBP should guess the user is biking given their speed; it should collect GPS information to reconstruct the followed path, and, at the same time, it should acquire data from the mobile device’s accelerometer and gyroscope to keep track of any significant movement of the device itself that suggests the presence of potholes or other problems. Since there is the possibility of having false positives (e.g., non-existent potholes), the user will have to confirm or correct the information acquired by BBP before this is made available to the community.
+
+\textbf{Trip}: A cycling session recorded by a user, consisting of a sequence of GPS points (route) and associated data like time and speed.
+
+\textbf{Obstacle}: Any significant hazard or impediment on a path, such as a pothole, road construction, fallen debris, or dangerous intersection. Users can report obstacles to warn others.
+
+\textbf{Accelerometer-Gyroscope}: Smartphone sensors that measure acceleration and orientation. BBP uses these to detect significant bumps or motions of the device that may indicate road problems (potholes, rough surface).
+
+\subsection{Acronyms}
+\textbf{BBP}: Best Bike Paths – the name of the platform.
+
+\textbf{GPS}: Global Positioning System – is one of the global navigation satellite systems (GNSS) that provide geolocation and time information to a GPS receiver anywhere on or near the Earth where signal quality permits \cite{gps}.
+
+\textbf{GDPR}: General Data Protection Regulation – is EU regulation for personal data and privacy \cite{gdpr}.
+
+\subsection{Abbreviations}
+\textbf{G}: Goal.
+
+\textbf{WP}: World Phenomena.
+
+\textbf{SP}: Shared Phenomena.
+
+
+\section{Revision history}
+\label{sec:Definitions, Acronyms, Abbreviations} %
+- Version 1.0: 23/12/2025
+
+\section{Reference Documents}
+\label{sec:Reference Documents} %
+\nocite{*}
+\printbibliography[heading=none]
+
+\section{Document Structure}
+\label{sec:Document Structure} %
+\textbf{Section 1: Introduction}
+
+This section offers a brief introduction of the purposes and scope of the platform. It also
+contains the list of definitions, acronyms and abbreviations that could be found in this
+document. Finally, there are changelog of the document, containing the revisions list and
+their content, and document structure, which describes the main purposes of the sections
+of this document.
+
+\textbf{Section 2: Overall Description}
+
+This section offers a summary description about the overall organization of the system,
+providing some scenarios and a description of the main features offered by the application,
+and of the actors who use it. It also contains the considered Assumptions.
+
+\textbf{Section 3: Specific Requirements}
+
+This section contains a description of functional requirements through use cases and
+diagrams, along with the Hardware and Software constraints and the interfaces needed to
+get it work.
+
+\textbf{Section 4: Formal Analysis through Alloy}
+
+This section contains a formal analysis of the model presented in the previous sections.

@@ -1,0 +1,169 @@
+\chapter{Requirements Traceability}
+
+This section breaks down how each RASD requirement is addressed by specific design elements. The tables below provide a clear mapping of how our design fulfills each requirement.
+
+\section{User Management and Authentication}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R1}: The system shall allow a new user to create an account by providing necessary information.\newline \textbf{R2}: The system shall allow a registered user to log in by providing their credentials.  \\ \hline
+\textbf{Components} & Web Browser, API Gateway, Authorization Manager, DBMS, Email Service Provider \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R4}: The system shall provide an interface for a logged-in user to view and edit their profile information.\newline \textbf{R5}: The system shall allow a user to log out of their account on a device.  \\ \hline
+\textbf{Components} & Web Browser, API Gateway, Authorization Manager, DBMS \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R33}: The system shall provide a section where a logged-in user can view their past recorded trips.
+  \\ \hline
+\textbf{Components} & Web Browser, API Gateway, DBMS, Trip Manager \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Trip Recording and Sensor Tracking}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+    \hline
+    \textbf{Requirements} & \textbf{R6}: The system should attempt to detect when the user is cycling and start recording.\newline \textbf{R7}: While recording, the system shall log the sequence of GPS coordinates that represent the user’s path. \newline \textbf{R17}: The system shall support continuing recording even if the user switches apps or
+    turns off the screen, once a recording is started. \\ \hline
+    \textbf{Components} & Web Browser \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R18}: While a trip recording is active (started by the user via R7), the system shall collect accelerometer and gyroscope data continuously in the background.
+  \\ \hline
+\textbf{Components} & Web Browser \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R8}: The system shall automatically compute summary statistics for the trip.\newline \textbf{R9}: After stopping the recording and computing stats, the system shall show the user a summary of their ride.
+ \newline \textbf{R10}: The system shall save the recorded trip data to the user’s account. \\ \hline
+\textbf{Components} & Web Browser, API Gateway, DBMS, Trip Manager \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R11}: When a trip is recorded, the system shall attempt to retrieve weather data for the ride.\newline \textbf{R12}: If weather data was successfully obtained for a trip, the system shall display it along with the other stats on the trip summary view (R11).  \\ \hline
+\textbf{Components} & Trip Manager, Weather API, Web Browser \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Community Data, Safety and Obstacles}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R13}: The system shall provide a feature for users to add a bike path entry manually.\newline \textbf{R14}: The system shall allow the user to mark any known obstacles or hazards along the path. \newline \textbf{R15}: The system shall prompt the user whether to publish this information to the community or keep it private. \\ \hline
+\textbf{Components} & Web Browser, API Gateway, Path Manager, Obstacle Manager \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & 
+\textbf{R19}: The system shall analyze the sensor data in real-time (or in short batches) to detect possible road anomalies.
+\newline \textbf{R20}: For each detected potential obstacle or anomaly during the ride, the system shall log it internally in the context of the current recording.  \\ \hline
+\textbf{Components} & API Gateway, Obstacle Manager, DBMS \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & 
+\textbf{R21}: When the trip is finished, if the system has any automatically detected events (R20), it shall prompt the user to review them.
+\newline \textbf{R22}: The system shall present the detected events in a user-friendly way.
+\newline \textbf{R23}: The user shall be able to confirm, reject or modifies the events. \newline \textbf{R24}: After the user has finished reviewing and confirming the data from an automated collection ride, the system shall save the verified information. \\ \hline
+\textbf{Components} & Web Browser, API Gateway, DBMS, Obstacle Manager \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & 
+\textbf{R25}: The system shall maintain a central repository of all published bike path entries. 
+\newline \textbf{R26}: The system shall allow updates to existing path entries.
+\newline \textbf{R28}: The system shall ensure that published path data does not include personal information about cyclists. \\ \hline
+\textbf{Components} & Path Manager, DBMS \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & 
+\textbf{R27}: Whenever new path information is published, the system shall integrate it into the dataset used for route queries.
+  \\ \hline
+\textbf{Components} & Path Manager, Street Manager, Overpass API \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Route Discovery and Navigation}
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & \textbf{R3}: The system shall permit users who are not logged in (guests) to use core viewing functions.
+  \\ \hline
+\textbf{Components} & Web Browser, API Gateway, Path Manager \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & 
+\textbf{R29}: The system shall provide an interface for the user to specify a start and end location for their desired trip (route query).
+\newline \textbf{R31}: FThe system shall display the calculated route(s) on the map UI for the user. \\ \hline
+\textbf{Components} & Web Browser \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|p{0.2\textwidth}|p{0.8\textwidth}|}
+\hline
+\textbf{Requirements} & 
+\textbf{R30}: The system shall compute a score or rating for each route found, to communicate
+its quality to the user.
+\newline \textbf{R32}: For each route, the system shall provide a summary of key details. \\ \hline
+\textbf{Components} & API Gateway, Routing Manager, OSRM API, Path Manager \\ \hline
+\end{tabular}
+\end{table}
+
+

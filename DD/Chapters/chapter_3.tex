@@ -1,0 +1,118 @@
+\chapter{User interface design}
+
+This chapter outlines the User Interface and User Experience architecture of the BBP platform, illustrating the visual layout of key pages and the functional flow triggered by user interactions.
+
+\textbf{SignUp and Login}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{SignUp_BBP.png}
+    \hfill
+    \includegraphics[width=0.45\textwidth]{Login_BBP.png}
+\end{figure}
+
+The registration and login interface presents a simple and clear
+form with fields for email and password, along with specific error messages for invalid inputs (e.g., incorrect email format). 
+
+Registration requires implicit user consent for access to device sensors and for personal data and privacy processing. The process provides instant feedback to inform the user of success or any registration issues.
+
+\newpage
+\textbf{Homepage}
+\begin{figure}[H]
+    \centering
+  \includegraphics[width=\textwidth]{Images/FindRoute_BBP.jpg}
+\end{figure}
+
+The homepage centers on the “Find Route” section, featuring an interactive map that displays only roads recognized by the system as cycling paths. The interface includes a search bar with two text fields for quickly entering a starting and destination address. 
+
+After data entry, a “Search Routes” button initiates the path search. The map supports standard zoom and pan operations and features interactive icons highlighting points of interest. At the top, icons for other app sections are present, such as “My Paths”, “Report Path”, as well as areas dedicated to the user profile, login, and sign out. 
+
+The interface is visible to both registered and unregistered users, with limitations on other areas for the latter.
+
+% \begin{center}
+%   \includegraphics[width=0.8\textwidth]{Images/HomePage_BBP.jpg}
+% \end{center}
+
+
+\newpage
+\textbf{Manual route entry}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/bbp - manual recording.png}
+\end{figure}
+
+The manual route entry interface, which can be accessed from “My Paths” via the “+ Record Path” button, allows a registered user to add traveled cycling streets through a search bar where available street names can be typed or selected. Streets not recognized by the system as cycling paths are not accepted. 
+
+For each street, the user can indicate the start and end points of the traversal and its condition by choosing from a list of basic options (e.g., optimal, fair, sufficient, needs maintenance). On the map, obstacles can be reported via the “Mark Obstacles” button, which allows the user to place them and add a brief description. 
+
+\newpage
+The interface includes fields for entering the path name, an optional description, travel time, and a star rating from 1 to 5. A final button allows saving the entered data and viewing a path summary with relevant automatically calculated statistics (such as distance traveled and average speed). At that point, the user can choose to save the path in “My Paths” or publish it. This section is available only to registered cyclists.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/bbp - trip reviewing.png}
+\end{figure}
+
+\newpage
+\textbf{Automatic Route Entry}
+
+% \begin{wrapfigure}{r}{0.5\textwidth}
+%  \centering
+%   \includegraphics[width=0.45\textwidth]{Images/bbp - automated mode.png}
+% \end{wrapfigure}
+
+% \begin{figure}[H]
+%  \centering
+%   \includegraphics[width=0.8\textwidth]{Images/AutomatedMode_BBP.jpg}
+% \end{figure}
+The automatic route entry interface activates automatically during recording using the registered user's device sensors. In the web app, it can be simulated in the automatic recording area via the “Automatic Mode” button. 
+
+At the end of the route, performance statistics and a list of detected streets to be confirmed or rejected are shown. Upon confirmation, a summary is displayed featuring a map highlighting the traced route with obstacles automatically detected by the sensors, streets with their respective status, star ratings, statistics, and a box with weather conditions. 
+
+The user can confirm, delete, or modify the data. They can then add a description and must provide a name for the path. The user can also publish the route, in addition to saving it in their personal area. 
+
+The automatic calculation of the status. This section is available only to registered cyclists.
+\vspace{1cm}
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=0.45\textwidth]{Images/bbp - automated mode.png}
+\end{figure}
+
+\newpage
+\textbf{Mark obstacles}
+\begin{figure}[H]
+    \centering
+  \includegraphics[width=\textwidth]{Images/ReportObstacle_BBP.jpg}
+\end{figure}
+This interface allows users to report obstacles along routes within the various reports. Registered cyclists can use the “Mark obstacles” feature to pinpoint the exact location of hazards directly on the map path. 
+
+Users can specify the obstacle type (e.g., water, potholes, other) and include additional notes. Once registered, obstacles are displayed as markers on the map and listed below it, showing their respective types and coordinates.
+
+\newpage
+\textbf{MyPaths}
+\begin{figure}[H]
+    \centering
+  \includegraphics[width=\textwidth]{Images/MyPaths_BBP.jpg}
+\end{figure}
+
+The “My Paths” interface allows users to view their saved routes in chronological order. Each entry shows information such as name, date, statistics, and any weather conditions. Simple buttons are available to delete, publish, or view the paths. 
+
+By choosing to view a route, it is displayed on the map along with detected obstacles. From there, the user can return to the path list. Deletions require confirmation to prevent accidental removal. This section is available only to registered cyclists.
+
+\newpage
+\textbf{Report route}
+
+\begin{figure}[H]
+    \centering
+  \includegraphics[width=\textwidth]{Images/ReportRoute2_BBP.png}
+\end{figure}
+
+This interface allows for the re-review of an existing path previously published and created by another user. A search bar allows the user to find the existing path by name. Once the itinerary is selected, the interface displays its current details and enables the user to submit a new report. 
+
+\newpage
+The cyclist can update the status of individual streets (e.g., optimal, fair, sufficient, needs maintenance), manage obstacles via the “Mark Obstacles” button, add an optional description, and provide a new star score. Upon completion, the “Submit Report” button sends the data; the system confirms the success of the operation and automatically recalculates the overall path status, updating the information on the map for the entire community. Conversely, the “Cancel” button discards the report.
+
+\begin{figure}[H]
+    \centering
+  \includegraphics[width=\textwidth]{Images/ReportRoute22_BBP.png}
+\end{figure}

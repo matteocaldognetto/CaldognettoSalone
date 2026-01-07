@@ -1,0 +1,92 @@
+\chapter{Introduction}
+\label{ch:Introduction}%
+
+\section{Purpose}
+\label{sec:Purpose} %
+Best Bike Paths is an innovative platform designed to offer an intuitive and engaging user experience for cyclists of all levels. The app’s design aims to create an accessible and easy-to-navigate environment, allowing cyclists to record their routes, view detailed maps, and quickly access personalized statistics in a clear manner. 
+
+The interface is crafted to ensure smooth use on mobile devices, integrating features that facilitate access even for less technological-oriented users, thanks to layout choices, colors, and interactions aimed at enhancing usability.
+
+The system is designed to encourage collaborative and sustainable activity by users, fostering a dynamic and involved community. The design emphasizes the usability of its features, maintaining transparency and control in operations, while allowing everyone to use the app simply and intuitively.
+
+\section{Scope}
+\label{sec:Scope}
+Best Bike Paths aims to provide a digital platform that facilitates smooth interaction among cyclists through an architectural design that supports the recording and sharing of data on cycling routes. The app is structured to be modular and scalable, managing both manually entered data and data automatically acquired via mobile sensors, ensuring information reliability through user confirmation or correction.
+
+The application is designed to offer an intuitive and accessible interface that allows all users to view interactive maps with suggested cycling routes ranked by scores and reviews, thereby enhancing route navigation and trip planning. The design also integrates features for managing dynamic data such as detailed travel statistics and up-to-date weather information.
+
+The goal is to create a system that guarantees usability, safety, accessibility, and ease of maintenance, promoting sustainable mobility and active community participation. Particular attention is given to user experience, efficient data management, and the adoption of accessibility standards to reach a broad and diverse audience.
+
+\newpage
+\section{Definitions, Acronyms, Abbreviations}
+\label{sec:Definitions, Acronyms, Abbreviations} %
+
+\subsection{Definitions}
+\textbf{Trip}: Represents a recorded bike trip with associated routes and metadata.
+
+\textbf{TripRoute}: A segment of a trip corresponding to a specific street or path section.
+
+\textbf{Path}: A published, community-accessible bike path that can be discovered by all users.
+
+\textbf{Street}: A real-world street segment with geometry and condition status.
+
+\textbf{PathReport}: A crowdsourced condition report submitted by users for trip routes or streets.
+
+\textbf{ObstacleReport}: A report of physical obstacles (potholes, debris, construction, etc.) encountered during trips.
+
+\textbf{PathSegment}: A link between a path and a street, defining the ordered composition of paths from streets.
+
+\textbf{TripRating}: User's rating (1-5) of their trip experience, required before publishing.
+
+\textbf{Manual Mode}: bikers insert the data manually, specifying the name of the streets in the path and their status.
+
+\textbf{Automated Mode}: bikers let BBP acquire data from their mobile devices while they bike. BBP should guess the user is biking given their speed; it should collect GPS information to reconstruct the followed path, and, at the same time, it should acquire data from the mobile device’s accelerometer and gyroscope to keep track of any significant movement of the device itself that suggests the presence of potholes or other problems. Since there is the possibility of having false positives (e.g., non-existent potholes), the user will have to confirm or correct the information acquired by BBP before this is made available to the community.
+
+\subsection{Acronyms}
+\textbf{BBP}: Best Bike Paths – the name of the platform.
+
+\textbf{GPS}: Global Positioning System – is one of the global navigation satellite systems (GNSS) that provide geolocation and time information to a GPS receiver anywhere on or near the Earth where signal quality permits \cite{gps}.
+
+\subsection{Abbreviations}
+\textbf{G}: Goal.
+
+\textbf{WP}: World Phenomena.
+
+\textbf{SP}: Shared Phenomena.
+
+\textbf{R}: Requirements.
+
+\section{Revision history}
+\label{sec:Definitions, Acronyms, Abbreviations} %
+- Version 1.0: 07/01/2026
+
+\section{Reference Documents}
+\label{sec:Reference Documents} %
+\nocite{*}
+\printbibliography[heading=none]
+
+\section{Document Structure}
+\label{sec:Document Structure} %
+\textbf{Section 1: Introduction}
+
+This section provides a general overview of the project, explaining the motivations and goals to be achieved, as well as offering a summary of the approach chosen for developing the platform.
+
+\textbf{Section 2: Architectural Design}
+
+This part describes the architectural structure of the platform at various levels of detail, presenting the main components, their interactions, and the design choices adopted.
+
+\textbf{Section 3: User Interface Design}
+
+This section presents the design of the user interfaces, with related diagrams and wireframes illustrating navigation and the organization of features.
+
+\textbf{Section 4: Requirements Traceability}
+
+This section explains how the objectives and requirements set are reflected in the system, linking functionalities with the design and operational components.
+
+\textbf{Section 5: Implementation, Integration and Test Plan}
+
+Details concerning the implementation, integration, and testing phases are provided, with information useful for those involved in the platform’s development and management.
+
+\textbf{Section 6: Effort Spent}
+
+The overall effort dedicated to the creation of the document and related activities is reported.

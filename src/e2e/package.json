@@ -1,0 +1,29 @@
+{
+  "name": "@repo/e2e",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pw:install": "playwright install",
+    "setup": "playwright test --project=setup",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:auth": "playwright test tests/auth/",
+    "test:trips": "playwright test tests/trips/",
+    "test:manual-paths": "playwright test tests/manual-paths/",
+    "test:automated": "playwright test tests/automated-collection/",
+    "test:path-repo": "playwright test tests/path-repository/",
+    "test:routes": "playwright test tests/route-search/",
+    "test:personal": "playwright test tests/personal-management/",
+    "test:journeys": "playwright test tests/journeys/",
+    "test:ci": "playwright test --reporter=junit,html",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen localhost:5173"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^24.9.1"
+  }
+}

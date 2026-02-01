@@ -1,0 +1,10 @@
+# Test artifacts
+test-results/
+playwright-report/
+results/
+
+# Auth state (generated)
+.auth/user.json
+
+# Dependencies
+node_modules/

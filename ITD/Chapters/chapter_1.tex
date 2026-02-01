@@ -1,0 +1,1082 @@
+\chapter{Introduction}
+
+\section{Purpose}
+Best Bike Paths (BBP) is a community-driven web platform designed for cyclists to discover safe routes and report bike path conditions through crowdsourced data.
+
+The system addresses the lack of centralized, up-to-date information about cycling infrastructure quality by enabling users to record bike trips, report path conditions (including obstacles such as potholes), and search for routes between locations.
+
+A key feature is the aggregation algorithm that merges multiple user reports into a single, freshness-weighted path quality score.
+
+\section{Scope}
+
+\subsection*{Included in scope}
+\begin{itemize}
+\item User registration and authentication (email/password, session-based).
+\item Trip recording with both manual and simulated (OSRM-based) data collection modes.
+\item Manual path condition reporting with obstacle marking.
+\item Path discovery and route search with interactive map visualization.
+\item Crowdsourced data aggregation with freshness-weighted scoring algorithm.
+\item Trip publishing as community paths.
+\item Obstacle lifecycle management.
+\end{itemize}
+
+\subsection*{Excluded from scope}
+\begin{itemize}
+\item Real-time features (live tracking, WebSocket notifications).
+\item Social features (profiles, following, comments).
+\item Turn-by-turn navigation and custom pathfinding.
+\item Native mobile applications.
+\item Admin dashboard and analytics.
+\item Email verification and password reset.
+\end{itemize}
+
+\subsection*{Target users}
+\paragraph{Guest User (unregistered)} Read-only access to path search, route visualization, and community map.
+\paragraph{Registered Cyclist} Full access including trip recording, path reporting, and data contribution.
+
+\section{Acronyms}
+
+\begin{table}[H]
+    \begin{tabular}{ll}
+    BBP & Best Bike Paths \\
+    SPA & Single Page Application \\
+    tRPC & TypeScript Remote Procedure Call \\
+    ORM & Object-Relational Mapping \\
+    OSRM & Open Source Routing Machine \\
+    RASD & Requirements Analysis and Specification Document \\
+    DD & Design Document \\
+    ITD & Implementation and Testing Document \\
+    API & Application Programming Interface \\
+    CRUD & Create, Read, Update, Delete \\
+    CI/CD & Continuous Integration / Continuous Deployment \\
+    E2E & End-to-End \\
+    JSONB & JSON Binary (PostgreSQL data type) \\
+    GeoJSON & Geographic JSON \\
+    CSRF & Cross-Site Request Forgery \\
+    ACID & Atomicity, Consistency, Isolation, Durability \\
+    MVP & Minimum Viable Product \\
+    \end{tabular}
+\end{table}
+
+\section{Reference Documents}
+The Software Engineering 2 course held by Prof.s Di Nitto Elisabetta, Camilli Matteo and Rossi Matteo Giovanni.
+
+The provided document describing the project: Assignment IT AY 2025-2026
+
+Project of last year provided as an assignment.
+
+The provided document describing the project: Assignment RDD AY 2025-2026
+
+\chapter{Implemented Functionalities and Requirements}
+
+\section{Functionalities}
+Refer to the RASD document for detailed descriptions under section 2.A.1
+
+\begin{tabularx}{\textwidth} { 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+ \hline
+ \textbf{Functionality} & \textbf{Status} \\
+ \hline
+ Registration and authentication & Implemented \\
+ \hline
+ Automated route recording  & Simulated  \\
+\hline
+ Manual route recording  & Implemented  \\
+\hline
+ Path visualization between two points  & Implemented  \\
+\hline
+ Display of the registered paths in the personal inventory  & Implemented  \\
+\hline
+ Reporting another path  & Implemented  \\
+\hline
+\end{tabularx}
+
+\section{Requirements}
+Refer to the RASD document for detailed descriptions under section 3.B
+
+\begin{tabularx}{\textwidth} { 
+  | p{0.1\textwidth}|X|p{0.2\textwidth}| }
+ \hline
+ R1 & The system shall allow a new user to create an account by providing necessary information. & Implemented \\
+ \hline
+ R2 & The system shall allow a registered user to log in by providing their credentials. & Implemented \\
+ \hline
+ R3 & The system shall permit users who are not logged in (guests) to use core viewing functions. & \\
+ \hline
+ R4 & The system shall provide an interface for a logged-in user to view and edit their profile information. & Implemented \\
+ \hline
+ R5 & The system shall allow a user to log out of their account on a device. & Implemented \\
+ \hline
+ R6 & The system should attempt to detect when the user is cycling and start recording. & Implemented \\
+ \hline
+ R7 & While recording, the system shall log the sequence of GPS coordinates that represent the user’s path. & Not implemented \\
+ \hline
+ R8 & The system shall automatically compute summary statistics for the trip. & Implemented \\
+ \end{tabularx}
+ 
+ \begin{tabularx}{\textwidth} { 
+  | p{0.1\textwidth}|X|p{0.2\textwidth}| }
+ R9 & After stopping the recording and computing stats, the system shall show the user a summary of their ride. & Simulated \\
+ \hline
+ R10 & The system shall save the recorded trip data to the user’s account. & Implemented \\
+ \hline
+ R11 & When a trip is recorded, the system shall attempt to retrieve weather data for the & Not implemented \\
+ \hline
+ R12 & If weather data was successfully obtained for a trip, the system shall display it along with the other stats on the trip summary view. & Not implemented \\
+ \hline
+ R13 & The system shall provide a feature for users to add a bike path entry manually. & Implemented \\
+ \hline
+ R14 & The system shall allow the user to mark any known obstacles or hazards along the path. & Implemented \\
+ \hline
+ R15 & The system shall prompt the user whether to publish this information to the community or keep it private. & Implemented \\
+ \hline
+ R17 & The system shall support continuing recording even if the user switches apps or turns off the screen, once a recording is started. & Implemented \\
+ \hline
+ R18 & While a trip recording is active (started by the user), the system shall collect accelerometer and gyroscope data continuously in the background. & Not implemented \\
+ \hline
+ R19 & The system shall analyze the sensor data in real-time (or in short batches) to detect possible road anomalies. & Not implemented \\
+ \hline
+ R20 & For each detected potential obstacle or anomaly during the ride, the system shall log it internally in the context of the current recording. & Not implemented \\
+ \hline
+ R21 & When the trip is finished, if the system has any automatically detected events, it shall prompt the user to review them. & Not implemented \\
+ \hline
+ R22 & The system shall present the detected events in a user-friendly way. & Not implemented \\
+ \hline
+ R23 & The user shall be able to confirm, reject or modifies the events. & Not implemented \\
+ \hline
+ R24 & After the user has finished reviewing and confirming the data from an automated collection ride, the system shall save the verified information. & Not implemented \\
+ \hline
+ R25 & The system shall maintain a central repository of all published bike path entries. & Implemented \\
+ \hline
+ R26 & The system shall allow updates to existing path entries. & Implemented \\
+ \hline
+ R27 & Whenever new path information is published, the system shall integrate it into the used for route queries. & Implemented \\
+ \hline
+ R28 & The system shall ensure that published path data does not include personal information about cyclist & Implemented \\
+ \hline
+ R29 & The system shall provide an interface for the user to specify a start and end location for their desired trip (route query). & Implemented \\
+ \end{tabularx}
+ 
+ \begin{tabularx}{\textwidth} { 
+  | p{0.1\textwidth}|X|p{0.2\textwidth}| }
+ R30 & The system shall compute a score or rating for each route found, to communicate its quality to the user. & Implemented \\
+ \hline
+ R31 & The system shall display the calculated route(s) on the map UI for the user. & Implemented \\
+ \hline
+ R32 & For each route, the system shall provide a summary of key details. & Implemented \\
+ \hline
+ R33 & The system shall provide a section where a logged-in user can view their past recorded trips. & Implemented \\
+\hline
+\end{tabularx}
+
+\chapter{Adopted Development Frameworks}
+The system follows a three-tier architecture: a React-based presentation layer communicates with a Hono/tRPC application layer, which persists data to a PostgreSQL data layer. The frontend and backend share TypeScript types end-to-end via tRPC, eliminating runtime type mismatches. The entire codebase is organized as a Bun monorepo using workspaces.
+
+\section{Adopted Programming Language}
+\subsection{Typescript}
+TypeScript is the sole programming language used across the entire stack — frontend, backend, database schema, tests, and build scripts. It was chosen for its strong static typing, which catches errors at compile time and provides end-to-end type safety when combined with tRPC and Drizzle ORM. TypeScript compiles to JavaScript and runs on the Bun runtime.
+
+\subsection{SQL (Postgres Dialect)}
+SQL is used indirectly through Drizzle ORM for database schema definitions and migrations. The generated migration files contain raw SQL DDL statements.
+
+\subsection{HTML/CSS}
+The frontend uses JSX (embedded in TypeScript .tsx files) for markup and Tailwind CSS v4 for styling. No raw HTML or CSS files are authored; all UI is composed declaratively through React components and utility-first CSS classes.
+
+\section{Adopted Middleware}
+\subsection{Hono}
+Hono is a lightweight, ultra-fast web framework designed for edge runtimes. It serves as the HTTP layer for the API server, handling request routing, middleware composition, and response serialization. Hono was chosen because it runs natively on Cloudflare Workers (the target production deployment) while also supporting standard Bun/Node.js servers for local development.
+
+\subsection{tRPC}
+tRPC provides end-to-end type-safe RPC between the frontend and backend without code generation or schema files. Procedures defined on the server are automatically typed on the client, ensuring that API contract changes are caught at compile time. tRPC is mounted on Hono at /api/trpc/* and supports request batching for performance.
+
+\subsection{React}
+React 19 is the UI library for the frontend SPA. It was chosen for its mature ecosystem, strong TypeScript support, concurrent rendering capabilities, and wide industry adoption. Functional components with hooks are used exclusively (no class components).
+
+\section{Utilized APIs not Present in the DD}
+\paragraph{OpenStreetMap Nominatim (Geocoding \& Street Search)}
+Convert street names to geographic coordinates and search for cyclable streets.
+
+\paragraph{OSRM (Open Source Routing Machine)}
+Calculate cycling routes between two geographic points with realistic geometry.
+
+\paragraph{OpenWeatherMap (Weather Enrichment)}
+Enrich trip data with meteorological conditions.
+
+\section{Platforms and Libraries}
+\subsection{Better Auth}
+Better Auth is the authentication framework handling user registration, login, session management, and CSRF protection. It integrates directly with Drizzle ORM for session storage in PostgreSQL. For the demo prototype, authentication is simplified to email/password only (no email verification, no OAuth, no password reset).
+
+\subsection{Drizzle ORM}
+Drizzle ORM provides type-safe SQL query building and schema management for PostgreSQL. It was chosen over Prisma for its lighter footprint, direct SQL mapping, and native PostgreSQL feature support. Drizzle Kit handles migration generation and application.
+
+\subsection{TanStack Router}
+TanStack Router provides file-based, type-safe routing for the React application. Route groups (auth) and (app) separate public and protected pages. Route guards via beforeLoad hooks enforce authentication requirements.
+
+\subsection{TanStack React Query}
+React Query manages server state (API data caching, refetching, and synchronization). It integrates with tRPC to provide automatic query invalidation, optimistic updates, and offline-first behavior. Configuration includes a 2-minute stale time and 3-attempt retry with exponential backoff.
+
+\section{Runtime and Environment}
+\subsection{Bun}
+
+Bun has been adopted as the primary JavaScript runtime and toolchain for the project, effectively replacing Node.js to streamline the development environment. It was selected for its ability to execute TypeScript natively, which eliminates the need for external transpilers or complex build configurations during the development phase, ensuring that the running code mirrors the source files without intermediate steps.
+
+Beyond its role as a runtime, Bun serves as the project's package manager, orchestrating the entire codebase structure. It manages the monorepo configuration through workspaces, handling dependency installation and symbolic linking between the separate frontend and backend applications efficiently. Furthermore, the integrated test runner is utilized to execute the unit and component tests described in Section 5, providing high-performance execution for the test suites directly from the project root.
+
+\chapter{Source Code Structure}
+The project is organized as a Bun monorepo with workspaces. The architectural pattern is a three-tier layered architecture with clear separation between presentation, application logic, and data persistence.
+
+\section{Components in the Source Code}
+The system is composed of three main runtime components that communicate over HTTP/tRPC.
+
+The frontend is a single-page application built with React 19. It communicates exclusively with the API server via tRPC HTTP calls. The Leaflet map library renders geographic data (paths, routes, obstacles) on interactive OpenStreetMap tiles. State is managed through a combination of TanStack React Query (server state), Jotai (global UI state), and React useState (local component state).
+
+The API server exposes six tRPC routers (user, trips, path, pathReport, street, routing) and additional HTTP endpoints (health check, OSRM proxy, auth). Each tRPC procedure is either publicProcedure (no auth required) or protectedProcedure (session required). The server also hosts the aggregation engine, which recalculates street status and path scores whenever a publishable report is created or modified.
+
+The database stores 10 tables across three domains: authentication (user, session, identity, verification), bike trip management (trip, tripRoute, tripRating), and path/reporting (path, pathSegment, pathReport, obstacleReport). All geographic data is stored as GeoJSON in JSONB columns. The Drizzle ORM provides type-safe query building and migration management.
+
+The API server includes a reverse proxy to a public OSRM instance that enables realistic route generation for the simulated trip mode. This component validates the routing profile (bike, car, foot) and coordinate format before forwarding the request.
+
+\chapter{Testing}
+
+\section{Integration Testing}
+
+Integration testing focused on verifying the correct interaction between the different modules of the system, specifically the database, the backend, and the frontend.
+
+\textbf{Database Layer:} The integration of the PostgreSQL database and the Drizzle ORM schema was verified during the initial development phases. The correctness of the tables and their relationships was confirmed by monitoring the Docker container logs and utilizing Drizzle Studio for visual schema inspection.
+
+\textbf{API Layer:} The communication between the React frontend and the Hono backend, managed via tRPC, was tested by verifying the data flow during application usage. Rather than using external tools, the integration was validated directly within the browser environment.
+
+
+\section{Automated Testing}
+
+To ensure reliability and prevent regression, the project includes both Unit Tests and End-to-End (E2E) tests.
+
+\subsection{Unit and Component Testing}
+The test suite includes 392 tests across 19 files, split into two main areas.
+
+\textbf{API (apps/api/)} — 15 files, 310 tests
+
+These tests focus on core backend business logic, including the aggregation engine (weighted status calculation, the path score formula with  weights, freshness decay, and a recency bonus). They also cover routing behavior and the OSRM adapter (response parsing plus error handling using mocked \lstinline{fetch}).
+
+Validation and security are extensively tested as well: Zod schemas for all tRPC endpoints, authentication enforcement, XSS/SQL injection sanitization, rate limiting, and OSRM proxy parameter validation. The obstacle state machine is verified end-to-end, including allowed and disallowed transitions across PENDING/CONFIRMED/REJECTED/CORRECTED/EXPIRED, along with tests for path publishing eligibility, spatial search (bounding boxes, corridor filtering, ranking), rating persistence and aggregation, and HTTP endpoints exercised against the real Hono app (health check, API info, OSRM proxy).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{api_coverage.jpg}
+    \caption{Unit Test Coverage Report for the API Workspace}
+    \label{fig:api_coverage}
+\end{figure}
+
+\textbf{App (apps/app/)} — 4 files, 86 tests
+
+These tests cover frontend utility logic extracted into testable modules, including autocomplete (suggestion filtering, query validation, keyboard navigation), formatting helpers (duration, distance, average speed), and map utilities (status-to-color mapping, bounding box calculation). They also validate the report form, trip simulation (route decomposition, GPS track generation, weather data), OSRM client utilities (coordinate generation, route result structure), and Overpass helpers (street snapping and street distance calculations).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{app_coverage.jpg}
+    \caption{Unit Test Coverage Report for the App Workspace}
+    \label{fig:app_coverage}
+\end{figure}
+
+\textbf{Execution:} To run the unit tests for the specific workspaces, the following commands are used from the project root:
+
+\begin{itemize}
+    \item \textbf{API Tests:}
+        \begin{lstlisting}
+        bun api:test
+        \end{lstlisting}
+    \item \textbf{App (Frontend) Tests:}  
+        \begin{lstlisting}
+        bun app:test
+        \end{lstlisting}
+\end{itemize}
+
+\subsection{E2E Testing}
+
+Playwright acts as an automated user, launching a real browser instance (Chromium) and interacting with the application exactly as a human would (clicking buttons, filling forms, navigating pages). This ensures that the Database, Backend, and Frontend work correctly together in a production-like environment.
+
+The following table describes the test cases considered for the system validation and their respective outcomes:
+
+% --- TABLE 1: AUTHENTICATION ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Authentication \& Access Control} \label{tab:auth_tests} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R1 - Registration Form} \newline 
+\footnotesize\textit{Allow a new user to create an account by providing necessary information.} & 
+User navigates to the sign-up page. & 
+Name, email, and password inputs are visible; Sign-up title is displayed. \\ 
+\hline
+
+\textbf{R1 - Valid Registration} \newline 
+\footnotesize\textit{Allow a new user to create an account by providing necessary information.} & 
+User fills valid name, email, and password. & 
+User is redirected to the authenticated area ('/routes'). \\ 
+\hline
+
+\textbf{R1 - Duplicate Email} \newline 
+\footnotesize\textit{Allow a new user to create an account by providing necessary information.} & 
+User attempts to register with an existing email. & 
+Error message displayed (matching "already exists" or "registered"). \\ 
+\hline
+
+\textbf{R1 - Password Validation} \newline 
+\footnotesize\textit{Allow a new user to create an account by providing necessary information.} & 
+User enters a password shorter than 8 characters. & 
+Validation text "Must be at least 8 characters" is visible. \\ 
+\hline
+
+\textbf{R1 - Input Validation} \newline 
+\footnotesize\textit{Allow a new user to create an account by providing necessary information.} & 
+User enters an invalid email format. & 
+Browser validation blocks submission (checkValidity returns false). \\ 
+\hline
+
+\textbf{R2 - Sign In Form} \newline 
+\footnotesize\textit{Allow a registered user to log in by providing their credentials.} & 
+User visits the login page. & 
+Email and password fields are visible; Sign-in title is displayed. \\ 
+\hline
+
+\textbf{R2 - Valid Login} \newline 
+\footnotesize\textit{Allow a registered user to log in by providing their credentials.} & 
+User enters valid email and password. & 
+Redirects to '/routes' (Dashboard). \\ 
+\hline
+
+\textbf{R2 - Login Error} \newline 
+\footnotesize\textit{Allow a registered user to log in by providing their credentials.} & 
+User enters incorrect email or password. & 
+Error message displayed (matching "invalid", "incorrect", or "not found"). \\ 
+\hline
+
+\textbf{R3 - Redirect Logic} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Unauthenticated user tries to access a protected page (e.g., '/trips'), then logs in. & 
+System redirects the user back to the originally requested page. \\ 
+\hline
+
+\textbf{R2 - Auth Guard} \newline 
+\footnotesize\textit{Allow a registered user to log in by providing their credentials.} & 
+Authenticated user attempts to visit the login page. & 
+System automatically redirects the user to '/routes'. \\ 
+\hline
+
+\textbf{R5 - Logout} \newline 
+\footnotesize\textit{Allow a user to log out of their account on a device.} & 
+User clicks the Logout button from the Settings page. & 
+Session is cleared; User is redirected to the login page. \\ 
+\hline
+
+\textbf{R5 - Access After Logout} \newline 
+\footnotesize\textit{Allow a user to log out of their account on a device.} & 
+User attempts to access a protected route after logging out. & 
+Access denied; User is redirected to the Login page. \\ 
+\hline
+
+\textbf{R3 - Guest Paths View} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Unauthenticated user navigates to '/paths'. & 
+Page loads successfully; Map and titles are visible. \\ 
+\hline
+
+\textbf{R3 - Guest CTA} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Guest user views the Paths page when data exists. & 
+"Call to Action" banner is displayed inviting the user to sign in. \\ 
+\hline
+
+\textbf{R3 - Guest Route Guard} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Guest user attempts to access '/trips', '/trip-record', or '/report'. & 
+System intercepts the request and redirects to '/login'. \\ 
+\hline
+
+\textbf{R3 - Guest Search} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Unauthenticated user visits the '/routes' page. & 
+Search inputs and map are fully visible and interactive. \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 2: AUTOMATED COLLECTION ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Automated Data Collection \& Sensors} \label{tab:auto_collection} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R6 - Automatic Mode} \newline 
+\footnotesize\textit{Attempt to detect when the user is cycling and start recording.} & 
+User visits the Trip Record page. & 
+"Automatic Mode" button is visible and interactive. \\ 
+\hline
+
+\textbf{R7 - Route Generation} \newline 
+\footnotesize\textit{Log the sequence of GPS coordinates that represent the user's path.} & 
+User fills trip info and clicks "Automatic Mode". & 
+System simulates GPS data; Route count is greater than 0. \\ 
+\hline
+
+\textbf{R8 - Metadata Display} \newline 
+\footnotesize\textit{Automatically compute summary statistics for the trip.} & 
+User generates routes in Automatic Mode. & 
+Generated route cards display calculated distance information. \\ 
+\hline
+
+\textbf{R12 - Auto-fill Data} \newline 
+\footnotesize\textit{Display weather data along with other stats if successfully obtained.} & 
+User initiates Automatic Mode. & 
+Trip details and weather section are automatically populated. \\ 
+\hline
+
+\textbf{R6 - Multiple Routes} \newline 
+\footnotesize\textit{Attempt to detect when the user is cycling and start recording.} & 
+User requests automatic route generation. & 
+System returns one or more route options (count $\ge$ 1). \\ 
+\hline
+
+\textbf{R18/R19 - Sensor Sim} \newline 
+\footnotesize\textit{Collect and analyze accelerometer and gyroscope data continuously.} & 
+Automatic mode runs with simulated sensor inputs. & 
+"Detected Obstacles" section becomes visible in the UI. \\ 
+\hline
+
+\textbf{R11 - Weather Integration} \newline 
+\footnotesize\textit{Attempt to retrieve weather data for the ride.} & 
+System fetches environmental data during recording. & 
+Weather section is visible; "Weather Condition" label is displayed. \\ 
+\hline
+
+\textbf{R21/R23 - Obstacle Verification} \newline 
+\footnotesize\textit{Prompt user to review detected events; allow confirm/reject.} & 
+User accesses the obstacle management interface. & 
+"Mark Obstacles" button is visible to allow user verification. \\ 
+\hline
+
+\textbf{R24 - Data Persistence} \newline 
+\footnotesize\textit{Save verified information after user review and confirmation.} & 
+User rates, reviews, and saves the auto-generated trip. & 
+Trip data is persisted; User is redirected to the '/trips' list. \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 3: JOURNEYS (E2E SCENARIOS) ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: End-to-End User Journeys} \label{tab:journeys} \\
+\hline
+\textbf{Scenario} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Scenario} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+New User Onboarding & 
+Guest lands on paths page, signs up, records first trip (auto mode), saves it. & 
+Account created; Trip saved successfully; User redirected to '/trips' history. \\ 
+\hline
+
+Guest Transition & 
+Guest browses map, attempts to access '/trips', signs up. & 
+Redirected to login, then automatically back to the originally requested '/trips' page. \\ 
+\hline
+
+Daily Commute & 
+User searches work route, records trip, marks obstacles, rates and saves. & 
+Trip saved with obstacle data; New entry appears in personal history. \\ 
+\hline
+
+Publishing Cycle & 
+User records a trip ("Scenic Route"), rates it 5 stars, selects "Publish". & 
+Trip becomes public; Verified visible in the community paths list. \\ 
+\hline
+
+Reporter Flow & 
+Full cycle: Search route $\rightarrow$ Record trip $\rightarrow$ Save $\rightarrow$ Browse Community. & 
+User completes the flow of consuming data (search) and contributing data (record/publish). \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 4: MANUAL PATHS & OBSTACLES ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Manual Path Recording \& Obstacles} \label{tab:manual_paths} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R13 - Manual Entry Mode} \newline 
+\footnotesize\textit{Provide a feature for users to add a bike path entry manually.} & 
+User visits Trip Record page (default view). & 
+Trip Name input and manual entry elements are displayed. \\ 
+\hline
+
+\textbf{R13 - Autocomplete} \newline 
+\footnotesize\textit{Provide a feature for users to add a bike path entry manually.} & 
+User accesses the street search field. & 
+Street autocomplete component is visible and functional. \\ 
+\hline
+
+\textbf{R6 - Mode Switching} \newline 
+\footnotesize\textit{Attempt to detect when user is cycling (Automatic vs Manual).} & 
+User clicks the "Automatic Mode" button. & 
+Interface switches mode; Route generation is triggered (loading indicator/routes appear). \\ 
+\hline
+
+\textbf{R13 - Validation} \newline 
+\footnotesize\textit{Provide a feature for users to add a bike path entry manually.} & 
+User attempts to review trip without entering a name. & 
+"Review" button remains disabled or validation prevents progression. \\ 
+\hline
+
+\textbf{R14 - Obstacle Mode} \newline 
+\footnotesize\textit{Allow the user to mark any known obstacles or hazards along the path.} & 
+User clicks "Enable Obstacle Mode" (or Mark Obstacles). & 
+UI indicator confirms mode activation. \\ 
+\hline
+
+\textbf{R14 - Marking Obstacles} \newline 
+\footnotesize\textit{Allow the user to mark any known obstacles or hazards along the path.} & 
+User clicks on the map while in Obstacle Mode. & 
+Dialog opens allowing input of obstacle details (type, description). \\ 
+\hline
+
+\textbf{R14 - Obstacle Types} \newline 
+\footnotesize\textit{Allow the user to mark any known obstacles or hazards along the path.} & 
+User interacts with the obstacle type selection. & 
+Dropdown menu displays multiple obstacle types (count > 1). \\ 
+\hline
+
+\textbf{R15 - Publish from Review} \newline 
+\footnotesize\textit{Prompt user whether to publish to the community or keep private.} & 
+User records a trip, rates it, and clicks "Publish". & 
+Publish action completes (confirmation dialog handled); Trip is made public. \\ 
+\hline
+
+\textbf{R15 - Publish from List} \newline 
+\footnotesize\textit{Prompt user whether to publish to the community or keep private.} & 
+User clicks "Make Public" on a saved private trip in the list. & 
+Button updates to "Published" or trip status changes in the list. \\ 
+\hline
+
+\textbf{R15 - Rating Requirement} \newline 
+\footnotesize\textit{Prompt user whether to publish to the community or keep private.} & 
+User checks publish availability without a rating. & 
+System ensures rating is present or handles the validation logic before publishing. \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 5: PATH REPOSITORY ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Path Repository \& Updates} \label{tab:path_repo} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R25 - Community Access} \newline 
+\footnotesize\textit{Maintain a central repository of all published bike path entries.} & 
+User navigates to the Paths page ('/paths'). & 
+Page title is displayed; Map component loads successfully showing community data. \\ 
+\hline
+
+\textbf{R29 - Search Interface} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User visits the Routes page. & 
+Start and End street input fields are visible and interactive. \\ 
+\hline
+
+\textbf{R29 - Route Query} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User initiates a search between two streets (e.g., "Via Torino" to "Corso Buenos Aires"). & 
+Search completes successfully; URL updates to reflect search parameters. \\ 
+\hline
+
+\textbf{R3 - Guest Search} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Unauthenticated guest visits the Routes page. & 
+Search functionality is fully available without requiring login. \\ 
+\hline
+
+\textbf{R26 - Report Access} \newline 
+\footnotesize\textit{Allow updates to existing path entries.} & 
+Authenticated user navigates to the Report page ('/report'). & 
+User is granted access; Path search input for reporting is visible. \\ 
+\hline
+
+\textbf{R26 - Condition Reporting} \newline 
+\footnotesize\textit{Allow updates to existing path entries.} & 
+User views the report interface. & 
+Controls for rating paths (stars) and adding notes/descriptions are present. \\ 
+\hline
+
+\textbf{R15 - Private Storage} \newline 
+\footnotesize\textit{Prompt user whether to publish to the community or keep private.} & 
+User saves a trip without publishing it. & 
+Trip remains visible only in the personal '/trips' list (Private) and checks verify it's saved. \\ 
+\hline
+
+\textbf{R27 - Public Availability} \newline 
+\footnotesize\textit{Integrate new path information into the dataset used for route queries.} & 
+User publishes a trip. & 
+Trip becomes visible on the public '/paths' community map. \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 6: PERSONAL MANAGEMENT ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Personal Management \& Community Map} \label{tab:personal_mgmt} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R33 - My Paths Access} \newline 
+\footnotesize\textit{Provide a section where a logged-in user can view their past recorded trips.} & 
+Authenticated user navigates to '/trips'. & 
+"My Paths" page title is visible. \\ 
+\hline
+
+\textbf{R33 - Trip Metadata} \newline 
+\footnotesize\textit{Provide a section where a logged-in user can view their past recorded trips.} & 
+User views the trip history list. & 
+Trip cards are displayed containing distance, duration, and average speed metadata. \\ 
+\hline
+
+\textbf{R6 - Record Navigation} \newline 
+\footnotesize\textit{Attempt to detect when the user is cycling and start recording.} & 
+User clicks the "Record Path" button from the history page. & 
+System redirects the user to the '/trip-record' page. \\ 
+\hline
+
+\textbf{R25 - Map Display} \newline 
+\footnotesize\textit{Maintain a central repository of all published bike path entries.} & 
+User visits the Paths page ('/paths') or Routes page. & 
+The community map component (Leaflet container) loads and is visible. \\ 
+\hline
+
+\textbf{R3 - Guest Viewing} \newline 
+\footnotesize\textit{Permit users who are not logged in (guests) to use core viewing functions.} & 
+Unauthenticated user visits the map page. & 
+Map is fully visible; A "Want to contribute?" CTA banner is displayed. \\ 
+\hline
+
+\textbf{R2 - Auth View} \newline 
+\footnotesize\textit{Allow a registered user to log in by providing their credentials.} & 
+Authenticated user visits the map page. & 
+Map is visible; The guest CTA banner is NOT displayed. \\ 
+\hline
+
+\textbf{R31 - Map Interactivity} \newline 
+\footnotesize\textit{Display the calculated route(s) on the map UI for the user.} & 
+User interacts with the map (hover/click). & 
+Map container remains visible and receives user events. \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 7: ROUTE SEARCH & VISUALIZATION ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Route Finder \& Visualization} \label{tab:route_search} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R29 - Search Interface} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User visits the Routes Finder page. & 
+Start/End street inputs, Search button, and Map are fully visible. \\ 
+\hline
+
+\textbf{R29 - Initial State} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User visits the page without performing a search. & 
+An info box explaining how to use the feature is visible. \\ 
+\hline
+
+\textbf{R29 - Route Query} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User fills valid Start/End streets and clicks Search. & 
+System queries the database; URL updates with `startStreet` and `endStreet` parameters. \\ 
+\hline
+
+\textbf{R29 - URL Loading} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User navigates directly to a URL with search parameters. & 
+Search is automatically triggered; Results are loaded without manual input. \\ 
+\hline
+
+\textbf{R30 - Route Scores} \newline 
+\footnotesize\textit{Compute a score or rating for each route found, to communicate quality.} & 
+System returns multiple routes for a query. & 
+Each route displays a calculated score; Routes are sorted by score (Best first). \\ 
+\hline
+
+\textbf{R30 - Result Limit} \newline 
+\footnotesize\textit{Compute a score or rating for each route found, to communicate quality.} & 
+Search returns many potential paths. & 
+System limits the display to a maximum of 5 top-scoring results. \\ 
+\hline
+
+\textbf{R31 - Visualization} \newline 
+\footnotesize\textit{Display the calculated route(s) on the map UI for the user.} & 
+User selects a specific route card from the results list. & 
+The selected path geometry (polyline) is highlighted on the map. \\ 
+\hline
+
+\textbf{R31 - Multi-Select} \newline 
+\footnotesize\textit{Display the calculated route(s) on the map UI for the user.} & 
+User switches selection between different route options. & 
+Map updates dynamically to show the newly selected path. \\ 
+\hline
+
+\textbf{R29 - No Results} \newline 
+\footnotesize\textit{Provide interface for user to specify start and end location (route query).} & 
+User searches for disconnected or invalid locations. & 
+"No routes found" message or info box is displayed; Map remains in a neutral state. \\ 
+\hline
+\end{longtable}
+
+% --- TABLE 8: TRIP MANAGEMENT ---
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{6cm}|}
+\caption{System Tests: Trip Creation, Statistics \& Details} \label{tab:trip_mgmt} \\
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endfirsthead
+\hline
+\textbf{Requirement} & \textbf{Input / Action} & \textbf{Expected Outcome} \\ 
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{R6 - Trip Recording} \newline 
+\footnotesize\textit{Attempt to detect when the user is cycling and start recording.} & 
+User navigates to '/trip-record'. & 
+Trip recording form, including Name input and "Automatic Mode" button, is displayed. \\ 
+\hline
+
+\textbf{R6 - Automatic Creation} \newline 
+\footnotesize\textit{Attempt to detect when the user is cycling and start recording.} & 
+User fills trip info, selects "Automatic Mode", sets rating, and saves. & 
+Trip is created; User is redirected to trips list; New trip appears in the list. \\ 
+\hline
+
+\textbf{R6 - Name Validation} \newline 
+\footnotesize\textit{Attempt to detect when the user is cycling and start recording.} & 
+User attempts to review/save without a trip name. & 
+Action is blocked; "Review" button is disabled or validation error appears. \\ 
+\hline
+
+\textbf{R7 - Route Generation} \newline 
+\footnotesize\textit{Log the sequence of GPS coordinates that represent the user's path.} & 
+User initiates Automatic Mode. & 
+System simulates route data; Route count becomes greater than 0; Map markers (Start/End) appear. \\ 
+\hline
+
+\textbf{R8 - Review Statistics} \newline 
+\footnotesize\textit{Automatically compute summary statistics for the trip.} & 
+User completes recording and enters review screen. & 
+Trip statistics (Distance, Duration) are calculated and displayed. \\ 
+\hline
+
+\textbf{R8 - Distance Calculation} \newline 
+\footnotesize\textit{Automatically compute summary statistics for the trip.} & 
+User reviews a recorded trip. & 
+Total distance is displayed (non-zero value with correct units km/m). \\ 
+\hline
+
+\textbf{R8 - Duration Track} \newline 
+\footnotesize\textit{Automatically compute summary statistics for the trip.} & 
+User completes a trip. & 
+Total elapsed time is tracked and displayed in the review summary. \\ 
+\hline
+
+\textbf{R8 - Speed Calc} \newline 
+\footnotesize\textit{Automatically compute summary statistics for the trip.} & 
+User reviews trip statistics. & 
+Average speed is calculated and displayed. \\ 
+\hline
+
+\textbf{R12 - Weather Auto-fill} \newline 
+\footnotesize\textit{Display weather data along with other stats if successfully obtained.} & 
+User uses Automatic Mode for recording. & 
+Weather section is visible; Temperature and conditions are automatically populated. \\ 
+\hline
+
+\textbf{R33 - Empty State} \newline 
+\footnotesize\textit{Provide a section where a logged-in user can view their past recorded trips.} & 
+User visits '/trips' with no saved history. & 
+Empty state message or placeholder is displayed correctly. \\ 
+\hline
+
+\textbf{R33 - Card Display} \newline 
+\footnotesize\textit{Provide a section where a logged-in user can view their past recorded trips.} & 
+User views the trip list. & 
+Trips are shown as cards containing summary statistics (Distance, Rating). \\ 
+\hline
+
+\textbf{R33 - Delete a trip} \newline 
+\footnotesize\textit{Provide a section where a logged-in user can view their past recorded trips.} & 
+User clicks "Delete" on a trip and confirms. & 
+Trip is removed from the list; Total trip count decreases. \\ 
+\hline
+
+\textbf{R9 - Trip Detail View} \newline 
+\footnotesize\textit{Show the user a summary of their ride after stopping recording.} & 
+User clicks "View" on a trip card. & 
+Navigates to '/trip-detail'; Full map visualization and detailed stats are shown. \\ 
+\hline
+\end{longtable}
+
+\textbf{Running the E2E Tests:} 
+
+To execute the End-to-End test suite, the environment must be properly configured. 
+
+Ensure that Node.js is installed on the machine. It can be downloaded from the official website: https://nodejs.org/en/download.
+
+\begin{itemize}
+    \item \textbf{Initial Setup (First Run Only):} Before running the tests for the first time, execute the following commands to install dependencies and generate the necessary authentication states:
+    
+    1. Install project dependencies: 
+    \begin{lstlisting}
+    bun install
+    \end{lstlisting}
+    
+    2. Navigate to the e2e directory and run the authentication setup:
+    
+    \begin{lstlisting}
+    npx playwright test tests/auth.setup.ts
+    \end{lstlisting}
+
+    \item \textbf{Execution (UI Mode):} To run the tests, navigate to the e2e directory and launch the interactive UI mode. This opens the Playwright Inspector, allowing step-by-step execution and visual debugging.
+
+    \begin{lstlisting}
+    npx playwright test --ui
+    \end{lstlisting}
+
+\end{itemize}
+
+The E2E testing suite focuses on validating functional requirements and critical user journeys (R1 to R33) within a real browser environment. Unlike unit tests, which measure code-level coverage, these tests ensure that the integration between the frontend, backend, and database remains consistent during complex operations. The following figure demonstrates the Playwright execution environment, where each test step is visually verified against the application's UI.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{E2E_UI.jpg}
+    \caption{Playwright UI Mode interface. The sidebar displays the organized test suites (authentication, automated collection, and user journeys), while the central panel shows the step-by-step execution and successful validation of the route generation logic (Requirement R8).}
+    \label{fig:app_coverage}
+\end{figure}
+
+
+
+
+\chapter{Installation Instructions}
+
+\section{Prerequisites}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lll}
+        Bun & = 1.2.0 & TypeScript runtime and package manager \\
+        Docker & Latest stable & PostgreSQL container for local development \\
+        Git & Any recent & Version control \\
+        Node.js & 18+ (optional) & Not strictly required; Bun replaces Node.js \\
+    \end{tabular}
+\end{table}
+
+\section{Preparing the Project}
+\textbf{Install all dependencies}
+\begin{lstlisting}[language=Java]
+bun install
+\end{lstlisting}
+This installs dependencies for all monorepo workspaces (apps, packages, db, e2e). The postinstall script automatically installs Playwright browsers.
+
+\textbf{Configure environment variables}
+The project includes a default \lstinline{.env} file pre-configured for local development:
+\begin{lstlisting}[language=Java]
+APP_NAME=Best Bike Paths
+APP_ORIGIN=http://localhost:5173
+API_ORIGIN=http://localhost:8787
+ENVIRONMENT=development
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/bbp
+BETTER_AUTH_SECRET=<your-generated-secret>
+PORT=8787
+\end{lstlisting}
+
+Generate a new \lstinline{BETTER_AUTH_SECRET}:
+\begin{lstlisting}[language=Java]
+bunx @better-auth/cli@latest secret
+\end{lstlisting}
+
+Replace the placeholder value in \lstinline{.env} with the generated secret.
+
+\textbf{Start PostgreSQL}
+\begin{lstlisting}[language=Java]
+docker compose up -d postgres
+\end{lstlisting}
+
+Verify it is running:
+\begin{lstlisting}[language=Java]
+docker compose ps
+# Expected: bbp-postgres running on port 5432
+\end{lstlisting}
+
+\textbf{(Optional) Seed the database with demo data}
+\begin{lstlisting}[language=Java]
+bun --filter @repo/db seed
+\end{lstlisting}
+
+
+\section{Running the Project}
+\textbf{Start all services at once}
+\begin{lstlisting}[language=Java]
+bun dev
+\end{lstlisting}
+
+This command automatically:
+\begin{itemize}
+    \item Starts PostgreSQL via Docker Compose (if not running)
+    \item Starts the API server on http://localhost:8787
+    \item Starts the React frontend on http://localhost:5173
+\end{itemize}
+
+\section{Interacting with the Project}
+\textbf{Access URLs:}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ll}
+        Frontend application & http://localhost:5173 \\
+        API server & http://localhost:8787 \\
+        API info endpoint & http://localhost:8787/api \\
+        Health check & http://localhost:8787/health \\
+        Drizzle Studio (DB GUI) & https://local.drizzle.studio (after \lstinline{bun --filter @repo/db studio}) \\
+    \end{tabular}
+\end{table}
+
+\textbf{Main user flows:}
+\begin{enumerate}
+    \item Register/Login: Navigate to http://localhost:5173/login. Enter name, email, and password to register, or email and password to log in.
+    \item Search for routes (guest or registered): Navigate to /routes. Enter a start and end street name (e.g., "Via Torino" and "Corso Buenos Aires"). The system searches for known paths and displays them on the map.
+    \item Record a trip (registered): Navigate to /trip-record.
+    \item Manual mode: Search for streets, pick start/end coordinates on the map, add weather and rating data, review, and save.
+    \item Automatic mode: Click "Simulate" to generate a trip with OSRM routing, random GPS points, and simulated sensor data. Review detected obstacles, confirm or reject them, then save.
+    \item View trips: Navigate to /trips to see all recorded trips. Click a trip to view its details and map route.
+    \item Publish a trip as a community path: From the trip list, click "Make Public" on a trip. The system requires a rating (1–5) before publishing. The trip's route is then available in the community path database.
+    \item Report path conditions: Navigate to /report. Search for an existing published path, select it, update street statuses, mark obstacles on the map, and submit the report.
+    \item Browse community paths: Navigate to /paths to see all published paths displayed on the map with their current condition status.
+\end{enumerate}
+
+\chapter{Available acceptance testing infrastructure}
+Our project \textbf{does not} support running the application on:
+\begin{itemize}
+    \item Android;
+    \item iOS;
+    \item Android emulators;
+    \item iOS emulators.
+\end{itemize}
+
+As previously mentioned, the system we developed is a web application.
+
+\chapter{Effort Spent}
+\begin{table}[H]
+    \centering
+    \small % Riduce la dimensione del carattere per far stare le 10 colonne
+    \setlength{\tabcolsep}{5pt} % Regola lo spazio tra le colonne
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+        \hline
+         & Cap. 1 & Cap. 2 & Cap. 3 & Cap. 4 & Cap. 5 & Cap. 6 & Cap. 7 & Revision \\
+        \hline
+        Caldognetto & 1 & 6 & 1 & 1 & 5 & 2 & 1 & 3 \\
+        \hline
+        Salone & 1 & 1 & 2 & 1 & 10 & 1 & 1 & 4 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\chapter{References}
+\begin{tabularx}{\textwidth} { 
+  >{\raggedright\arraybackslash}X 
+  >{\raggedright\arraybackslash}X}
+        Hono framework documentation & https://hono.dev/ \\
+        tRPC documentation & https://trpc.io/docs \\ 
+        Drizzle ORM documentation & https://orm.drizzle.team/ \\
+        Better Auth documentation & https://www.better-auth.com/ \\ 
+        React 19 documentation & https://react.dev/ \\
+        TanStack Router documentation & https://tanstack.com/router/latest \\
+        TanStack React Query documentation & https://tanstack.com/query/latest \\
+        Jotai documentation & https://jotai.org/ \\
+        Leaflet.js documentation & https://leafletjs.com/ \\
+        Playwright documentation & https://playwright.dev/ \\
+        Bun runtime documentation & https://bun.sh/docs \\
+        shadcn/ui component library & https://ui.shadcn.com/ \\
+        Tailwind CSS v4 documentation & https://tailwindcss.com/ \\
+        OSRM (Open Source Routing Machine) API & https://project-osrm.org/docs/v5.24.0/api/ \\
+        Vitest testing framework & https://vitest.dev/ \\
+        PostgreSQL 16 documentation & https://www.postgresql.org/docs/16/ \\
+        Cloudflare Workers documentation & https://developers.cloudflare.com/workers/ \\
+        Zod schema validation & https://zod.dev/ \\
+    \end{tabularx}
+

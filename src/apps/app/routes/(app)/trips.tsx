@@ -128,9 +128,9 @@ function TripsPage() {
   const confirmMakePublic = async () => {
     if (!tripToPublic) return;
     try {
-      await makePublic.mutateAsync({ 
-        tripId: tripToPublic.id, 
-        pathName: tripToPublic.name 
+      await makePublic.mutateAsync({
+        tripId: tripToPublic.id,
+        pathName: tripToPublic.name
       });
       setPublicDialogOpen(false);
       setTripToPublic(null);
@@ -170,7 +170,7 @@ function TripsPage() {
 
   const confirmDelete = async () => {
     if (!tripToDeleteId) return;
-    
+
     try {
       await deleteTrip.mutateAsync({ tripId: tripToDeleteId });
       setDeleteDialogOpen(false);
@@ -217,7 +217,7 @@ function TripsPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: "/trip-report" } as any)}
+                onClick={() => navigate({ to: "/report" } as any)}
               >
                 Report a Route
               </Button>
@@ -366,14 +366,14 @@ function TripsPage() {
                   <DialogTitle className="text-xl font-bold">Publish to Community</DialogTitle>
                 </div>
                 <DialogDescription>
-                  Are you sure you want to make "{tripToPublic?.name}" public? 
+                  Are you sure you want to make "{tripToPublic?.name}" public?
                   It will be visible to all users on the Discover map.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter className="mt-4">
                 <Button variant="outline" onClick={() => setPublicDialogOpen(false)}>Cancel</Button>
-                <Button 
-                  onClick={confirmMakePublic} 
+                <Button
+                  onClick={confirmMakePublic}
                   disabled={makePublic.isPending}
                   className="bg-blue-600 hover:bg-blue-700"
                 >

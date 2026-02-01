@@ -303,6 +303,16 @@ function TripRecordPage() {
 
   const removeRoute = (index: number) => {
     setRoutes(routes.filter((_, i) => i !== index));
+    // Rebuild routeStatuses with corrected indices
+    const newStatuses: Record<number, "optimal" | "medium" | "sufficient" | "requires_maintenance"> = {};
+    let newIdx = 0;
+    for (let i = 0; i < routes.length; i++) {
+      if (i !== index) {
+        newStatuses[newIdx] = routeStatuses[i] || "medium";
+        newIdx++;
+      }
+    }
+    setRouteStatuses(newStatuses);
   };
 
   /**
@@ -423,7 +433,26 @@ function TripRecordPage() {
       avgSpeed: Math.round(avgSpeed * 100) / 100,
       startTime,
       endTime: now,
-      pathStatus: "medium",
+      pathStatus: (() => {
+        const statusValues: Record<string, number> = {
+          optimal: 4,
+          medium: 3,
+          sufficient: 2,
+          requires_maintenance: 1,
+        };
+        const reverseMapping: Record<number, string> = {
+          4: "optimal",
+          3: "medium",
+          2: "sufficient",
+          1: "requires_maintenance",
+        };
+        const statuses = routes.map((_, idx) => routeStatuses[idx] || "medium");
+        if (statuses.length === 0) return "medium";
+        const avg =
+          statuses.reduce((sum, s) => sum + (statusValues[s] || 3), 0) /
+          statuses.length;
+        return (reverseMapping[Math.round(avg)] || "medium") as "optimal" | "medium" | "sufficient" | "requires_maintenance";
+      })(),
       weather: {
         condition: weatherCondition,
         temperature: temperature !== "" ? Number(temperature) : undefined,
@@ -597,6 +626,13 @@ function TripRecordPage() {
       }
 
       setRoutes(demoRoutes);
+
+      // Initialize routeStatuses for all generated routes
+      const initialStatuses: Record<number, "optimal" | "medium" | "sufficient" | "requires_maintenance"> = {};
+      demoRoutes.forEach((_, idx) => {
+        initialStatuses[idx] = "optimal";
+      });
+      setRouteStatuses(initialStatuses);
 
       // Simulate weather
       const weatherConditions = ["clear", "cloudy", "rainy", "windy", "foggy"];
@@ -806,11 +842,12 @@ function TripRecordPage() {
         if (status) {
           const tripRouteId = routeIds[i];
           try {
-            createPathReportMutation.mutateAsync({
+            await createPathReportMutation.mutateAsync({
               tripRouteId,
               status,
               isPublishable: true,
               collectionMode: "manual",
+              streetName: routes[i].name,
             });
             console.log(
               `Path report created for route ${i} with status: ${status}`,
@@ -863,7 +900,7 @@ function TripRecordPage() {
             id: `route-${idx}`,
             name: route.name,
             description: `${(parseFloat(route.distance) || 0).toFixed(2)} km`,
-            currentStatus: usedAutomaticMode ? "optimal" : routeStatuses[idx],
+            currentStatus: routeStatuses[idx] || "medium",
             geometry: route.geometry || {
               type: "LineString" as const,
               coordinates: [
@@ -1002,10 +1039,21 @@ function TripRecordPage() {
                             </p>
                           </div>
                           
-                          <div className="bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 flex flex-col items-center">
-                            <span className="text-[10px] font-bold text-green-600 uppercase">Status</span>
-                            <span className="text-xs font-bold text-green-700">Optimal</span>
-                          </div>
+                          {(() => {
+                            const status = routeStatuses[idx] || "medium";
+                            const statusConfig = {
+                              optimal: { bg: "bg-green-50", border: "border-green-100", labelColor: "text-green-600", valueColor: "text-green-700", label: "Optimal" },
+                              medium: { bg: "bg-yellow-50", border: "border-yellow-100", labelColor: "text-yellow-600", valueColor: "text-yellow-700", label: "Medium" },
+                              sufficient: { bg: "bg-orange-50", border: "border-orange-100", labelColor: "text-orange-600", valueColor: "text-orange-700", label: "Sufficient" },
+                              requires_maintenance: { bg: "bg-red-50", border: "border-red-100", labelColor: "text-red-600", valueColor: "text-red-700", label: "Maintenance" },
+                            }[status];
+                            return (
+                              <div className={`${statusConfig.bg} px-3 py-1.5 rounded-lg border ${statusConfig.border} flex flex-col items-center`}>
+                                <span className={`text-[10px] font-bold ${statusConfig.labelColor} uppercase`}>Status</span>
+                                <span className={`text-xs font-bold ${statusConfig.valueColor}`}>{statusConfig.label}</span>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     ))}
@@ -1889,11 +1937,20 @@ function TripRecordPage() {
                             </div>
                           </div>
                           
-                          {route.name !== "Connecting path" && (
-                            <div className="bg-green-50 px-2 py-1 rounded text-[10px] font-bold text-green-600 border border-green-100 uppercase">
-                              Optimal
-                            </div>
-                          )}
+                          {route.name !== "Connecting path" && (() => {
+                            const status = routeStatuses[idx] || "optimal";
+                            const cfg = {
+                              optimal: { bg: "bg-green-50", text: "text-green-600", border: "border-green-100", label: "Optimal" },
+                              medium: { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-100", label: "Medium" },
+                              sufficient: { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100", label: "Sufficient" },
+                              requires_maintenance: { bg: "bg-red-50", text: "text-red-600", border: "border-red-100", label: "Maintenance" },
+                            }[status];
+                            return (
+                              <div className={`${cfg.bg} px-2 py-1 rounded text-[10px] font-bold ${cfg.text} border ${cfg.border} uppercase`}>
+                                {cfg.label}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>

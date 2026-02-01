@@ -155,10 +155,10 @@ export class TripRecordPage extends BasePage {
     // Wait for either:
     // 1. The modal with "Automatic Mode Complete" (success case)
     // 2. Or a loading indicator that eventually leads to the modal
-    
+
     // First, wait a moment for the API call to start
     await this.page.waitForTimeout(500);
-    
+
     // Wait for modal to appear (Automatic Mode Complete)
     // OSRM calls can be slow, so use a longer timeout
     // Use a more flexible selector that matches partial text
@@ -202,11 +202,13 @@ export class TripRecordPage extends BasePage {
    * Fill obstacle dialog
    */
   async fillObstacleDetails(type: string, description?: string): Promise<void> {
-    await this.page.selectOption("select", type);
+    // Radix UI Select: click the trigger to open, then select the option
+    await this.page.getByLabel(/Obstacle Type/i).click();
+    await this.page.getByRole("option", { name: new RegExp(type, "i") }).click();
     if (description) {
-      await this.page.fill("textarea", description);
+      await this.page.getByLabel("Description").first().fill(description);
     }
-    await this.page.getByRole("button", { name: /Save|Add/i }).click();
+    await this.page.getByRole("button", { name: /Save Obstacle/i }).click();
   }
 
   /**
@@ -239,18 +241,18 @@ export class TripRecordPage extends BasePage {
     // Set up dialog listener before clicking
     const dialogPromise = this.page.waitForEvent("dialog");
     await this.saveTripButton.click();
-    
+
     // Wait for result dialog
     const dialog = await dialogPromise;
     const message = dialog.message();
-    
+
     // Verify success
     if (!message.includes("saved with")) {
       console.error(`[Test] Save failed with alert: ${message}`);
       await dialog.accept().catch(() => {});
       throw new Error(`Trip save failed: ${message}`);
     }
-    
+
     await dialog.accept().catch(() => {});
   }
 

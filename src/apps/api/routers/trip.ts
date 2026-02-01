@@ -1,8 +1,9 @@
 import { and, asc, desc, eq, schema } from "@repo/db";
 import { z } from "zod";
+import { aggregateStreetReports } from "../lib/aggregation.js";
 import { protectedProcedure, router } from "../lib/trpc.js";
 
-const { trip, tripRoute, tripRating, obstacleReport, path, street, pathSegment } = schema;
+const { trip, tripRoute, tripRating, obstacleReport, path, pathReport, street, pathSegment } = schema;
 
 /**
  * Trip router - handles bike trip recording with ordered routes
@@ -781,6 +782,19 @@ export const tripRouter = router({
           if (existingStreet) {
             streetId = existingStreet.id;
           } else {
+            // Try to get initial status from existing pathReport for this tripRoute
+            const [existingReport] = await ctx.db
+              .select({ status: pathReport.status })
+              .from(pathReport)
+              .where(
+                and(
+                  eq(pathReport.tripRouteId, route.id),
+                  eq(pathReport.isPublishable, true),
+                )
+              )
+              .orderBy(desc(pathReport.createdAt))
+              .limit(1);
+
             const [newStreet] = await ctx.db
               .insert(street)
               .values({
@@ -793,6 +807,7 @@ export const tripRouter = router({
                   ],
                 },
                 isCyclable: true,
+                currentStatus: existingReport?.status || null,
               })
               .returning();
             streetId = newStreet.id;
@@ -816,6 +831,9 @@ export const tripRouter = router({
               .set({ streetId })
               .where(eq(tripRoute.id, route.id));
           }
+
+          // Aggregate existing pathReports for this street to compute currentStatus
+          await aggregateStreetReports(streetId, ctx.db);
         }
       }
 

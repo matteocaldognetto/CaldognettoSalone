@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { TripRecordPage } from "../../pages/trip-record.page";
 import { TripsPage } from "../../pages/trips.page";
-import { generateTripName } from "../../utils/test-data";
+import { generateTripName, MOCK_OVERPASS_XML } from "../../utils/test-data";
 
 /**
  * R33: Trip History Tests
@@ -19,6 +19,15 @@ test.describe("R33: Trip History (My Paths)", () => {
 
   test.beforeEach(async ({ page }) => {
     tripsPage = new TripsPage(page);
+
+    // Mock Overpass API to avoid timeouts during automatic mode
+    await page.route("**/overpass-api.de/api/interpreter", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/xml",
+        body: MOCK_OVERPASS_XML,
+      });
+    });
   });
 
   test("R33: should display My Paths page", async ({ page }) => {

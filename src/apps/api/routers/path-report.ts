@@ -31,28 +31,31 @@ async function updateStreetStatusFromReports(
       .from(tripRoute)
       .where(eq(tripRoute.id, tripRouteId));
 
-    if (!routeData || !routeData.streetId) {
-      // Route doesn't link to a street yet, nothing to update
-      return;
-    }
+    if (routeData?.streetId) {
+      streetId = routeData.streetId;
+    } else if (routeData?.name) {
+      // Fallback: tripRoute has no streetId yet, try to find street by route name
+      const [streetData] = await db
+        .select()
+        .from(street)
+        .where(eq(street.name, routeData.name));
 
-    streetId = routeData.streetId;
-  } else if (streetName) {
-    // For street-only reports, look up street by name
+      if (streetData) {
+        streetId = streetData.id;
+      }
+    }
+  }
+
+  // If still no streetId, try the explicitly passed streetName
+  if (!streetId && streetName) {
     const [streetData] = await db
       .select()
       .from(street)
       .where(eq(street.name, streetName));
 
-    if (!streetData) {
-      // Street not found, nothing to update
-      return;
+    if (streetData) {
+      streetId = streetData.id;
     }
-
-    streetId = streetData.id;
-  } else {
-    // Can't determine street, skip update
-    return;
   }
 
   // Use aggregateStreetReports which handles street status update

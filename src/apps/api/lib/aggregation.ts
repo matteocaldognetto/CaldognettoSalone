@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, schema } from "@repo/db";
+import { and, asc, eq, gte, inArray, isNull, schema } from "@repo/db";
 import type { DB } from "better-auth/adapters/drizzle";
 import { calculatePathDeviation } from "./routing.js";
 
@@ -64,29 +64,61 @@ function calculateRecencyBonus(reports: (typeof pathReport.$inferSelect)[]) {
 export async function aggregateStreetReports(streetId: string, db: DB) {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
+  // Get the street record to access its name for standalone report matching
+  const [streetData] = await db
+    .select({ id: street.id, name: street.name })
+    .from(street)
+    .where(eq(street.id, streetId));
+
+  if (!streetData) {
+    return null;
+  }
+
   // Get all trip routes that link to this street
   const routesForStreet = await db
     .select({ id: tripRoute.id })
     .from(tripRoute)
     .where(eq(tripRoute.streetId, streetId));
 
-  if (routesForStreet.length === 0) {
-    return null;
-  }
-
   const routeIds = routesForStreet.map((r: any) => r.id);
 
-  // Get reports for these routes
-  const reports = await db
-    .select()
-    .from(pathReport)
-    .where(
-      and(
-        eq(pathReport.isPublishable, true),
-        gte(pathReport.createdAt, thirtyDaysAgo),
-        inArray(pathReport.tripRouteId, routeIds),
-      ),
-    );
+  // Query 1: Reports linked via tripRouteId
+  let routeBasedReports: any[] = [];
+  if (routeIds.length > 0) {
+    routeBasedReports = await db
+      .select()
+      .from(pathReport)
+      .where(
+        and(
+          eq(pathReport.isPublishable, true),
+          gte(pathReport.createdAt, thirtyDaysAgo),
+          inArray(pathReport.tripRouteId, routeIds),
+        ),
+      );
+  }
+
+  // Query 2: Standalone reports matched by streetName (where tripRouteId is null)
+  let standaloneReports: any[] = [];
+  if (streetData.name) {
+    standaloneReports = await db
+      .select()
+      .from(pathReport)
+      .where(
+        and(
+          eq(pathReport.isPublishable, true),
+          gte(pathReport.createdAt, thirtyDaysAgo),
+          eq(pathReport.streetName, streetData.name),
+          isNull(pathReport.tripRouteId),
+        ),
+      );
+  }
+
+  // Combine and deduplicate reports (by id)
+  const reportMap = new Map<string, any>();
+  for (const r of [...routeBasedReports, ...standaloneReports]) {
+    reportMap.set(r.id, r);
+  }
+  const reports = Array.from(reportMap.values());
 
   if (reports.length === 0) {
     return null;

@@ -1,9 +1,9 @@
-import { asc, desc, eq, inArray, schema, sql } from "@repo/db";
+import { and, asc, desc, eq, inArray, schema, sql } from "@repo/db";
 import { z } from "zod";
-import { calculatePathScore, calculatePathStatusFromStreets, updatePathStatusAndScore } from "../lib/aggregation.js";
+import { aggregateStreetReports, calculatePathScore, calculatePathStatusFromStreets, updatePathStatusAndScore } from "../lib/aggregation.js";
 import { protectedProcedure, publicProcedure, router } from "../lib/trpc.js";
 
-const { path, pathSegment, street, trip, tripRoute, obstacleReport } = schema;
+const { path, pathReport, pathSegment, street, trip, tripRoute, obstacleReport } = schema;
 
 /**
  * Path router - handles bike path management and discovery
@@ -513,6 +513,19 @@ export const pathRouter = router({
             // Use existing street
             streetId = existingStreet.id;
           } else {
+            // Try to get initial status from existing pathReport for this tripRoute
+            const [existingReport] = await ctx.db
+              .select({ status: pathReport.status })
+              .from(pathReport)
+              .where(
+                and(
+                  eq(pathReport.tripRouteId, route.id),
+                  eq(pathReport.isPublishable, true),
+                )
+              )
+              .orderBy(desc(pathReport.createdAt))
+              .limit(1);
+
             // Create new street record from trip route data
             const [newStreet] = await ctx.db
               .insert(street)
@@ -526,7 +539,7 @@ export const pathRouter = router({
                   ],
                 },
                 isCyclable: true,
-                currentStatus: null, // Unknown status for newly created streets
+                currentStatus: existingReport?.status || null,
               })
               .returning();
 
@@ -551,6 +564,9 @@ export const pathRouter = router({
             .set({ streetId: streetId })
             .where(eq(tripRoute.id, route.id))
             .execute();
+
+          // Aggregate existing pathReports for this street to compute currentStatus
+          await aggregateStreetReports(streetId, ctx.db);
         }
       }
 

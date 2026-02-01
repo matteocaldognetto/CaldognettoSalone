@@ -240,9 +240,35 @@ export function RouteResults({
                 </div>
               )}
 
+              {/* Street Status Summary - always visible */}
+              {!isExpanded && route.streets.length > 0 && (
+                <div className="mt-3 border-t pt-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {route.streets.map((street) => {
+                      const sc = getStatusColor(street.currentStatus);
+                      return (
+                        <span
+                          key={street.id}
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${sc.bg} ${sc.text}`}
+                        >
+                          <span className={`h-1.5 w-1.5 rounded-full ${
+                            street.currentStatus === "optimal" ? "bg-green-500" :
+                            street.currentStatus === "medium" ? "bg-yellow-500" :
+                            street.currentStatus === "sufficient" ? "bg-orange-500" :
+                            street.currentStatus === "requires_maintenance" ? "bg-red-500" :
+                            "bg-gray-400"
+                          }`} />
+                          {street.name}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Selection Indicator */}
               {!isExpanded && (
-                <div className="mt-3 flex items-center gap-2 text-xs">
+                <div className="mt-2 flex items-center gap-2 text-xs">
                   {isSelected && (
                     <span className="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
                   )}
@@ -253,7 +279,7 @@ export function RouteResults({
                       setExpandedRoute(route.id);
                     }}
                   >
-                    Click to see streets →
+                    Click for details →
                   </span>
                 </div>
               )}
